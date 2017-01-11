@@ -1,0 +1,5 @@
+aws:
+  s3:
+    bucket: review-apps-dev
+  ecs:
+    cluster_name: do-review-apps
