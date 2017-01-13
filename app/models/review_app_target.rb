@@ -26,6 +26,18 @@ class ReviewAppTarget
     self
   end
 
+  def update
+    task_info.task.stop
+    task_info.delete
+
+    current_task = task_definition.run
+    if current_task
+      @task_info = TaskInfo.new(review_app_target: self, task: current_task)
+      task_info.save
+      self
+    end
+  end
+
   def task_definition
     @task_definition ||= TaskDefinition.new(review_app_target: self)
   end
