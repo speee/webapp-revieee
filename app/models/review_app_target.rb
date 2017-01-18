@@ -1,9 +1,6 @@
 class ReviewAppTarget
   include ActiveModel::Model
 
-  TASK_DEFINITION_MAPS = {
-  }.freeze
-
   attr_accessor :repository, :branch, :pr_number
 
   validates :repository, presence: true
@@ -38,6 +35,6 @@ class ReviewAppTarget
   end
 
   def task_definition_name
-    @task_definition_name = TASK_DEFINITION_MAPS.fetch(repository)
+    @task_definition_name = Settings.task_definition_maps.fetch(repository)
   end
 end
