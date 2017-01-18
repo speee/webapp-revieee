@@ -35,6 +35,6 @@ class ReviewAppTarget
   end
 
   def task_definition_name
-    @task_definition_name = Settings.task_definition_maps.fetch(repository)
+    @task_definition_name = Settings.task_definition_maps[repository]
   end
 end
