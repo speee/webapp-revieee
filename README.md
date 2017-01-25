@@ -1,24 +1,9 @@
-# README
+# Dev Review Apps
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Dev Review Apps is a Amazon ECS management API server using Ruby on Rails Framework.
+This project is only worked on Amazon ECS.
 
-Things you may want to cover:
+# Reporting Bugs and Contributing Code
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Want to report a bug or request a feature? Please open an issue.
+Want to help us? Fork the project, and make a pull request. We need all the help we can get!
