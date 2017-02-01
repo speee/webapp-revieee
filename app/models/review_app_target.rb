@@ -42,4 +42,8 @@ class ReviewAppTarget
   def task_definition_name
     @task_definition_name = Settings.task_definition_maps[repository]
   end
+
+  def cache_clear_url
+    "#{target.endpoint}/review_apps/clear"
+  end
 end
