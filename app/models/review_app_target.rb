@@ -19,8 +19,8 @@ class ReviewAppTarget
   end
 
   def delete
-    task_info.task.stop
-    task_info.delete
+    task.stop
+    task.destroy
     self
   end
 
@@ -33,8 +33,8 @@ class ReviewAppTarget
     @task_definition ||= TaskDefinition.new(review_app_target: self)
   end
 
-  def task_info
-    @task_info ||= TaskInfo.new(review_app_target: self)
+  def task
+    @task ||= Task.find_by_review_app_target(self)
   end
 
   def task_definition_name

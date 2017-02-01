@@ -8,6 +8,15 @@ class Task < ApplicationRecord
 
   after_initialize :build_endpoints, if: -> { endpoints.blank? }
 
+  scope :find_by_review_app_target, ->(t) { find_by(repository: t.repository, pr_number: t.pr_number) }
+
+  def stop
+    ecs.stop_task(
+      cluster: Settings.aws.ecs.cluster_name,
+      task: arn,
+    )
+  end
+
   private
 
   def build_endpoints
