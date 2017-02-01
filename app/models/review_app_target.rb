@@ -26,6 +26,11 @@ class ReviewAppTarget
     self
   end
 
+  def update
+    delete
+    create
+  end
+
   def task_definition
     @task_definition ||= TaskDefinition.new(review_app_target: self)
   end
@@ -36,5 +41,9 @@ class ReviewAppTarget
 
   def task_definition_name
     @task_definition_name = Settings.task_definition_maps[repository]
+  end
+
+  def cache_clear_url
+    "#{target.endpoint}/review_apps/clear"
   end
 end
