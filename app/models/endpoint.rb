@@ -9,6 +9,14 @@ class Endpoint < ApplicationRecord
 
   after_initialize :set_subdomain, -> { subdomain.blank? }
 
+  def url
+    "http://#{domain}/"
+  end
+
+  def domain
+    "#{subdomain}.#{Settings.domain}"
+  end
+
   private
 
   def set_subdomain

@@ -7,10 +7,6 @@ class ReviewAppTarget
   validates :branch, presence: true
   validates :pr_number, presence: true
 
-  def endpoint
-    "http://#{task_info.subdomain}.#{Settings.domain}/"
-  end
-
   def create
     @task = task_definition.run
     if @task && @task.save
