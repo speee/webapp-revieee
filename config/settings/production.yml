@@ -1,5 +1,3 @@
 aws:
-  s3:
-    bucket: review-apps
   ecs:
     cluster_name: do-review-apps
