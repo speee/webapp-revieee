@@ -6,4 +6,12 @@ class Endpoint < ApplicationRecord
   validates :subdomain, presence: true, uniqueness: true, length: { is: 32 }
   validates :ip, presence: true, format: { with: IP_REGEXP }
   validates :port, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 65535 }
+
+  after_initialize :set_subdomain, -> { subdomain.blank? }
+
+  private
+
+  def set_subdomain
+    self.subdomain = Digest::MD5.hexdigest([task.repository, task.pr_number, ip, port].join(','))
+  end
 end

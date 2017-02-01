@@ -12,10 +12,8 @@ class ReviewAppTarget
   end
 
   def create
-    task = task_definition.run
-    if task
-      @task_info = TaskInfo.new(review_app_target: self, task: task)
-      task_info.save
+    @task = task_definition.run
+    if @task && @task.save
       self
     end
   end
