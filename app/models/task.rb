@@ -20,8 +20,9 @@ class Task < ApplicationRecord
   private
 
   def build_endpoints
-    task_resource.dig(:containers).each do |c|
-      port = c.dig(:network_bindings).map(&:host_port).first
+    return unless task_resource
+    task_resource[:containers].each do |c|
+      port = c[:network_bindings].map(&:host_port).first
       next unless port
       endpoints.build(ip: private_ip, port: port)
     end
