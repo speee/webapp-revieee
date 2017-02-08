@@ -10,16 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170201065237) do
+ActiveRecord::Schema.define(version: 20170208021608) do
 
   create_table "endpoints", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "subdomain",  limit: 32, null: false
     t.string   "ip",         limit: 15, null: false
     t.integer  "port",       limit: 2,  null: false, unsigned: true
     t.integer  "task_id",               null: false, unsigned: true
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
-    t.index ["subdomain"], name: "index_endpoints_on_subdomain", unique: true, using: :btree
     t.index ["task_id"], name: "index_endpoints_on_task_id", using: :btree
   end
 
