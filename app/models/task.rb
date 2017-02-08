@@ -6,7 +6,7 @@ class Task < ApplicationRecord
   validates :pr_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
   validates :endpoints, presence: true
 
-  after_initialize :build_endpoints, if: -> { endpoints.blank? }
+  after_initialize :build_endpoints, if: -> { new_record? && endpoints.blank? }
 
   scope :find_by_review_app_target, ->(t) { find_by(repository: t.repository, pr_number: t.pr_number) }
 
