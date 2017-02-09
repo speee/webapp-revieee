@@ -7,22 +7,16 @@ class ReviewAppTarget
   validates :branch, presence: true
   validates :pr_number, presence: true
 
-  def endpoint
-    "http://#{task_info.subdomain}.#{Settings.domain}/"
-  end
-
   def create
-    task = task_definition.run
-    if task
-      @task_info = TaskInfo.new(review_app_target: self, task: task)
-      task_info.save
+    @task = task_definition.run
+    if @task && @task.save
       self
     end
   end
 
   def delete
-    task_info.task.stop
-    task_info.delete
+    task.stop
+    task.destroy
     self
   end
 
@@ -35,8 +29,8 @@ class ReviewAppTarget
     @task_definition ||= TaskDefinition.new(review_app_target: self)
   end
 
-  def task_info
-    @task_info ||= TaskInfo.new(review_app_target: self)
+  def task
+    @task ||= Task.find_by_review_app_target(self)
   end
 
   def task_definition_name

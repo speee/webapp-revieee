@@ -9,7 +9,13 @@ class TaskDefinition
 
   def run
     task_arn = run_task
-    Task.new(arn: task_arn) if task_arn
+    if task_arn
+      Task.new(
+        arn: task_arn,
+        repository: review_app_target.repository,
+        pr_number: review_app_target.pr_number,
+      )
+    end
   end
 
   private

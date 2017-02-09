@@ -1,9 +1,14 @@
-class Task
-  include ActiveModel::Model
+class Task < ApplicationRecord
+  has_many :endpoints, dependent: :destroy
 
-  attr_accessor :arn
+  validates :arn, presence: true
+  validates :repository, presence: true, uniqueness: { scope: :pr_number }
+  validates :pr_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
+  validates :endpoints, presence: true
 
-  validates :task_arn, presence: true
+  after_initialize :build_endpoints, if: -> { new_record? && endpoints.blank? }
+
+  scope :find_by_review_app_target, ->(t) { find_by(repository: t.repository, pr_number: t.pr_number) }
 
   def stop
     ecs.stop_task(
@@ -12,27 +17,32 @@ class Task
     )
   end
 
-  def private_ip
-    container_instance_arn = task.dig(:container_instance_arn)
-    instance_id = ecs.describe_container_instances(
-      cluster: Settings.aws.ecs.cluster_name,
-      container_instances: [container_instance_arn]
-    ).dig(:container_instances, 0, :ec2_instance_id)
-    ec2.describe_instances(instance_ids: [instance_id]).dig(:reservations, 0, :instances, 0, :private_ip_address)
-  end
-
-  def port
-    task.dig(:containers).map(&:network_bindings).flatten.map(&:host_port).first
-  end
-
-  def exist?
-    task.present?
-  end
-
   private
 
-  def task
-    @task ||= ecs.wait_until(
+  def build_endpoints
+    return unless task_resource
+    task_resource[:containers].each do |c|
+      port = c[:network_bindings].map(&:host_port).first
+      next unless port
+      endpoints.build(ip: private_ip, port: port)
+    end
+  end
+
+  def private_ip
+    @private_ip ||= ec2.describe_instances(
+      instance_ids: [instance_id]
+    ).dig(:reservations, 0, :instances, 0, :private_ip_address)
+  end
+
+  def instance_id
+    @instance_id ||= ecs.describe_container_instances(
+      cluster: Settings.aws.ecs.cluster_name,
+      container_instances: [task_resource.dig(:container_instance_arn)]
+    ).dig(:container_instances, 0, :ec2_instance_id)
+  end
+
+  def task_resource
+    @task_resource ||= ecs.wait_until(
       :tasks_running,
       tasks: [arn],
       cluster: Settings.aws.ecs.cluster_name,
