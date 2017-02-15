@@ -3,7 +3,7 @@ class Api::WebhooksController < Api::ApplicationController
 
   def github_callback
     event_name = request.headers.fetch('X-GitHub-Event')
-    payload = JSON.parse(request.body.read)
+    payload = JSON.parse(request_body)
     action = PullRequest::Actions.build(event_name: event_name, payload: payload)
 
     if action
@@ -28,7 +28,12 @@ class Api::WebhooksController < Api::ApplicationController
     github_signature = request.headers.fetch('X-Hub-Signature')
     return false unless github_signature
 
-    signature = "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Settings.github.webhook_secret, request.body.read)}"
+    signature = "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Settings.github.webhook_secret, request_body)}"
     Rack::Utils.secure_compare(signature, github_signature)
+  end
+
+  def request_body
+    request.body.rewind
+    request.body.read
   end
 end
