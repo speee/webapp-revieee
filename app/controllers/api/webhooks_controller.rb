@@ -21,10 +21,10 @@ class Api::WebhooksController < Api::ApplicationController
   private
 
   def authenticate
-    head :unauthorized unless verify_signature
+    head :unauthorized unless valid_signature?
   end
 
-  def verify_signature
+  def valid_signature?
     github_signature = request.headers.fetch('X-Hub-Signature')
     return false unless github_signature
 
