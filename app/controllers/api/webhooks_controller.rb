@@ -25,7 +25,7 @@ class Api::WebhooksController < Api::ApplicationController
   end
 
   def valid_signature?
-    github_signature = request.headers.fetch('X-Hub-Signature')
+    github_signature = request.headers.fetch('X-Hub-Signature', nil)
     return false unless github_signature
 
     signature = "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Settings.github.webhook_secret, request_body)}"
