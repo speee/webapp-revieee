@@ -13,3 +13,15 @@ task_definition_maps:
 
 database:
   password: xxxxx
+
+spot_fleet:
+  iam_fleet_role_arn: xxxx
+  spot_price: xxxx
+  target_capacity: xxxx
+  availability_zone: xxxx
+  group_id: xxxx
+  iam_instance_profile: xxxx
+  image_id: xxxx
+  instance_type: xxxx
+  key_name: xxxx
+  subnet_id: xxxx
