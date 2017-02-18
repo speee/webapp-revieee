@@ -19,7 +19,10 @@ module SpotFleetRequest
       end
     end
 
-    def cancel
+    def describe(spot_fleet_request_id)
+      ec2.describe_spot_fleet_requests({
+        spot_fleet_request_ids: [ spot_fleet_request_id ]
+      })
     end
   end
 end
