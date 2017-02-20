@@ -8,6 +8,7 @@ module SpotFleetRequest
     INSTANCE_TYPE = Settings.spot_fleet.instance_type
     KEY_NAME = Settings.spot_fleet.key_name
     SUBNET_ID = Settings.spot_fleet.subnet_id
+    CLUSTER_NAME = Settings.spot_fleet.cluster_name
 
     attr_reader :iam_instance_profile, :image_id, :instance_type
     attr_reader :key_name, :group_id, :subnet_id, :availability_zone
@@ -32,11 +33,20 @@ module SpotFleetRequest
         key_name: key_name,
         security_groups: [{ group_id: group_id }],
         placement: { availability_zone: availability_zone },
-        subnet_id: subnet_id
+        subnet_id: subnet_id,
+        user_data: user_data
       }
     end
 
     private
+
+    def user_data
+      command = <<~COMMAND
+        #!bin/bash
+        echo ECS_CLUSTER=#{CLUSTER_NAME} >> /etc/ecs/ecs.config
+      COMMAND
+      Base64.strict_encode64(command)
+    end
 
     def defaults
       {

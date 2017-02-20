@@ -25,3 +25,4 @@ spot_fleet:
   instance_type: xxxx
   key_name: xxxx
   subnet_id: xxxx
+  cluster_name: xxxx
