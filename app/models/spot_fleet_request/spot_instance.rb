@@ -31,14 +31,22 @@ module SpotFleetRequest
         image_id: image_id,
         instance_type: instance_type,
         key_name: key_name,
-        security_groups: [{ group_id: group_id }],
         placement: { availability_zone: availability_zone },
-        subnet_id: subnet_id,
+        network_interfaces: [ network_interfaces ],
         user_data: user_data
       }
     end
 
     private
+
+    def network_interfaces
+      {
+        device_index: 0,
+        associate_public_ip_address: true,
+        subnet_id: subnet_id,
+        groups: [ group_id ]
+      }
+    end
 
     def user_data
       command = <<~COMMAND
