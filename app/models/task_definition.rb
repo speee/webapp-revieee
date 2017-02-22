@@ -22,7 +22,7 @@ class TaskDefinition < ApplicationRecord
   def run_task(review_app_target)
     ecs.run_task(
       cluster: Settings.aws.ecs.cluster_name,
-      task_definition: get_latest_arn,
+      task_definition: latest_arn,
       overrides: {
         container_overrides: [
           {
@@ -39,7 +39,7 @@ class TaskDefinition < ApplicationRecord
     ).dig(:tasks, 0, :task_arn)
   end
 
-  def get_latest_arn
+  def latest_arn
     ecs.list_task_definitions(
       family_prefix: name,
       status: 'ACTIVE',
