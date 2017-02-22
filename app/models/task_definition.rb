@@ -1,19 +1,17 @@
 class TaskDefinition < ApplicationRecord
-  attr_accessor :review_app_target
-
   validates :repository, presence: true, uniqueness: true
   validates :name, presence: true
 
   def exist?
-    ecs.list_task_definition_families.families.include?(review_app_target.task_definition_name)
+    ecs.list_task_definition_families.families.include?(name)
   end
 
-  def run
-    task_arn = run_task
+  def run(review_app_target)
+    task_arn = run_task(review_app_target)
     if task_arn
       Task.new(
         arn: task_arn,
-        repository: review_app_target.repository,
+        repository: repository,
         pr_number: review_app_target.pr_number,
       )
     end
@@ -21,7 +19,7 @@ class TaskDefinition < ApplicationRecord
 
   private
 
-  def run_task
+  def run_task(review_app_target)
     ecs.run_task(
       cluster: Settings.aws.ecs.cluster_name,
       task_definition: get_latest_arn,
@@ -43,7 +41,7 @@ class TaskDefinition < ApplicationRecord
 
   def get_latest_arn
     ecs.list_task_definitions(
-      family_prefix: review_app_target.task_definition_name,
+      family_prefix: name,
       status: 'ACTIVE',
       sort: 'DESC',
       max_results: 1,
