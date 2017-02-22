@@ -25,7 +25,7 @@ class Api::WebhooksController < Api::ApplicationController
   end
 
   def valid_signature?
-    github_signature = request.headers.fetch('X-Hub-Signature', nil)
+    github_signature = request.get_header('X-Hub-Signature')
     return false unless github_signature
 
     signature = "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), Settings.github.webhook_secret, request_body)}"
@@ -33,7 +33,6 @@ class Api::WebhooksController < Api::ApplicationController
   end
 
   def request_body
-    request.body.rewind
-    request.body.read
+    @request_body ||= request.body.read
   end
 end
