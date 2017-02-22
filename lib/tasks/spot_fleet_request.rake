@@ -12,5 +12,11 @@ namespace :spotfleet do
       client = SpotFleetRequest::Client.new
       client.cancel(args.spot_fleet_request_id)
     end
+
+    desc 'Describe spot fleet request with spot_fleet_request_id'
+    task :describe, [:spot_fleet_request_id] do |task, args|
+      client = SpotFleetRequest::Client.new
+      client.describe(args.spot_fleet_request_id)
+    end
   end
 end
