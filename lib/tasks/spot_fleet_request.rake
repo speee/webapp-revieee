@@ -18,5 +18,14 @@ namespace :spotfleet do
       client = SpotFleetRequest::Client.new
       client.describe(args.spot_fleet_request_id)
     end
+
+    task set_logging: :environment do
+      Rails.logger = Logger.new(STDOUT)
+      Rails.logger.level = Logger::DEBUG
+    end
+
+    task create: :set_logging
+    task describe: :set_logging
+    task cancel: :set_logging
   end
 end
