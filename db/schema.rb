@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170201065237) do
+ActiveRecord::Schema.define(version: 20170222095544) do
 
   create_table "endpoints", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "ip",         limit: 15, null: false
@@ -19,6 +19,14 @@ ActiveRecord::Schema.define(version: 20170201065237) do
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
     t.index ["task_id"], name: "index_endpoints_on_task_id", using: :btree
+  end
+
+  create_table "task_definitions", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "repository", null: false
+    t.string   "name",       null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository"], name: "index_task_definitions_on_repository", unique: true, using: :btree
   end
 
   create_table "tasks", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

@@ -1,7 +1,8 @@
-class TaskDefinition
-  include ActiveModel::Model
-
+class TaskDefinition < ApplicationRecord
   attr_accessor :review_app_target
+
+  validates :repository, presence: true, uniqueness: true
+  validates :name, presence: true
 
   def exist?
     ecs.list_task_definition_families.families.include?(review_app_target.task_definition_name)
