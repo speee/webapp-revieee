@@ -24,7 +24,7 @@ module SpotFleetRequest
     end
 
     def cancel(spot_fleet_request_id)
-      ec2.cancel_spot_fleet_requests({ spot_fleet_request_ids: [ spot_fleet_request_id ] })
+      ec2.cancel_spot_fleet_requests({ spot_fleet_request_ids: [ spot_fleet_request_id ], terminate_instances: true })
     end
   end
 end
