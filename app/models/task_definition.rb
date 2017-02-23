@@ -1,4 +1,6 @@
 class TaskDefinition < ApplicationRecord
+  has_many :tasks
+
   validates :repository, presence: true, uniqueness: true
   validates :name, presence: true
 
@@ -9,11 +11,11 @@ class TaskDefinition < ApplicationRecord
   def run(review_app_target)
     task_arn = run_task(review_app_target)
     if task_arn
-      Task.new(
+      task = tasks.build(
         arn: task_arn,
-        repository: repository,
         pr_number: review_app_target.pr_number,
       )
+      task if task.save
     end
   end
 

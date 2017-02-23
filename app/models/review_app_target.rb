@@ -9,9 +9,7 @@ class ReviewAppTarget
 
   def create
     @task = task_definition.run(self)
-    if @task && @task.save
-      self
-    end
+    self if @task
   end
 
   def delete

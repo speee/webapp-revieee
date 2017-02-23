@@ -1,14 +1,21 @@
 class Task < ApplicationRecord
+  belongs_to :task_definition
   has_many :endpoints, dependent: :destroy
 
   validates :arn, presence: true
-  validates :repository, presence: true, uniqueness: { scope: :pr_number }
+  validates :task_definition, presence: true, uniqueness: { scope: :pr_number }
   validates :pr_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
   validates :endpoints, presence: true
 
   after_initialize :build_endpoints, if: -> { new_record? && endpoints.blank? }
 
-  scope :find_by_review_app_target, ->(t) { find_by(repository: t.repository, pr_number: t.pr_number) }
+  class << self
+    def find_by_review_app_target(review_app_target)
+      joins(:task_definition)
+        .merge(TaskDefinition.where(repository: review_app_target.repository))
+        .find_by(pr_number: review_app_target.pr_number)
+    end
+  end
 
   def stop
     ecs.stop_task(
