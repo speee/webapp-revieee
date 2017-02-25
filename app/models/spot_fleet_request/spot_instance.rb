@@ -50,7 +50,7 @@ module SpotFleetRequest
 
     def user_data
       command = <<~COMMAND
-        #!bin/bash
+        #!/bin/bash
         echo ECS_CLUSTER=#{CLUSTER_NAME} >> /etc/ecs/ecs.config
       COMMAND
       Base64.strict_encode64(command)
