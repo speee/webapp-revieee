@@ -7,11 +7,11 @@ module SpotFleetRequest
 
     attr_reader :iam_fleet_role_arn, :spot_price, :target_capacity, :spot_instance
 
-    def initialize(iam_role_arn: nil, spot_price: nil, capacity: nil, spot_instance: nil)
+    def initialize(spot_instance, iam_role_arn: nil, spot_price: nil, capacity: nil)
+      @spot_instance = spot_instance
       @iam_fleet_role_arn = iam_role_arn || IAM_FLEET_ROLE_ARN
       @spot_price = spot_price || SPOT_PRICE
       @target_capacity = capacity || TARGET_CAPACITY
-      @spot_instance = spot_instance
     end
 
     # TODO:

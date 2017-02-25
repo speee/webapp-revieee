@@ -8,7 +8,7 @@ module SpotFleetRequest
 
     def create
       spot_instance = SpotInstance.new
-      request_config = RequestConfig.new(spot_instance: spot_instance)
+      request_config = RequestConfig.new(spot_instance)
       response = @ec2.request_spot_fleet(request_config.to_hash)
       Rails.logger.info "spot fleet request is accepted! request_id: #{response.spot_fleet_request_id}"
     end
