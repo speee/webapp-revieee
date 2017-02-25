@@ -14,7 +14,7 @@ module SpotFleetRequest
     attr_reader :key_name, :group_id, :subnet_id, :availability_zone
 
     def initialize(args: {})
-      args.merge!(defaults)
+      args = defaults.merge(args)
 
       @iam_instance_profile = args[:iam_instance_profile]
       @image_id = args[:image_id]
