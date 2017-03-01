@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170201065237) do
+ActiveRecord::Schema.define(version: 20170222112917) do
 
   create_table "endpoints", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "ip",         limit: 15, null: false
@@ -21,14 +21,23 @@ ActiveRecord::Schema.define(version: 20170201065237) do
     t.index ["task_id"], name: "index_endpoints_on_task_id", using: :btree
   end
 
-  create_table "tasks", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string   "arn",        null: false
+  create_table "task_definitions", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "repository", null: false
-    t.integer  "pr_number",  null: false, unsigned: true
+    t.string   "name",       null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["repository", "pr_number"], name: "index_tasks_on_repository_and_pr_number", unique: true, using: :btree
+    t.index ["repository"], name: "index_task_definitions_on_repository", unique: true, using: :btree
+  end
+
+  create_table "tasks", unsigned: true, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "arn",                null: false
+    t.integer  "task_definition_id", null: false, unsigned: true
+    t.integer  "pr_number",          null: false, unsigned: true
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+    t.index ["task_definition_id", "pr_number"], name: "index_tasks_on_task_definition_id_and_pr_number", unique: true, using: :btree
   end
 
   add_foreign_key "endpoints", "tasks"
+  add_foreign_key "tasks", "task_definitions"
 end

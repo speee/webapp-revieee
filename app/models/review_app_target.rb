@@ -8,10 +8,8 @@ class ReviewAppTarget
   validates :pr_number, presence: true
 
   def create
-    @task = task_definition.run
-    if @task && @task.save
-      self
-    end
+    @task = task_definition.run(self)
+    self if @task
   end
 
   def delete
@@ -26,15 +24,11 @@ class ReviewAppTarget
   end
 
   def task_definition
-    @task_definition ||= TaskDefinition.new(review_app_target: self)
+    @task_definition ||= TaskDefinition.find_by(repository: repository)
   end
 
   def task
     @task ||= Task.find_by_review_app_target(self)
-  end
-
-  def task_definition_name
-    @task_definition_name = Settings.task_definition_maps[repository]
   end
 
   def cache_clear_url
