@@ -13,26 +13,21 @@ RSpec.describe Api::WebhooksController, type: :controller do
       end
     end
 
-    let(:request_body) { JSON.generate({ hoge: :fuga }) }
+    subject { get :index, body: request_body }
 
     before { request.set_header 'HTTP_X_HUB_SIGNATURE', signature }
 
-    context 'with valid signature' do
-      let(:signature) { "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), 'valid_secret', request_body)}" }
+    let(:request_body) { JSON.generate({ hoge: :fuga }) }
+    let(:signature) { "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), secret, request_body)}" }
 
-      it 'return ok status' do
-        get :index, body: request_body
-        expect(response).to have_http_status(:ok)
-      end
+    context 'with valid signature' do
+      let(:secret) { 'valid_secret' }
+      it { is_expected.to have_http_status(:ok) }
     end
 
     context 'with invalid signature' do
-      let(:signature) { "sha1=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), 'invalid_secret', request_body)}" }
-
-      it 'return unauthorized status' do
-        get :index, body: request_body
-        expect(response).to have_http_status(:unauthorized)
-      end
+      let(:secret) { 'invalid_secret' }
+      it { is_expected.to have_http_status(:unauthorized) }
     end
   end
 end
