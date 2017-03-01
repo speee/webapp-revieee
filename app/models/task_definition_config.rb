@@ -20,7 +20,7 @@ class TaskDefinitionConfig
 
     def parse_content(response)
       return {} if response.blank?
-      YAML.load(Base64.decode64(response[:content]))
+      YAML.load(Base64.decode64(response[:content])).symbolize_keys
     end
 
     def load_github_content(repository:, branch:, path:)
@@ -28,5 +28,9 @@ class TaskDefinitionConfig
       github.contents(repository, path: path, ref: branch)
     rescue Octokit::NotFound
     end
+  end
+
+  def to_hash
+    content
   end
 end

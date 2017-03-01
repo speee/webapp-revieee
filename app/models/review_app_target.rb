@@ -8,6 +8,7 @@ class ReviewAppTarget
   validates :pr_number, presence: true
 
   def create
+    task_definition = TaskDefinition.find_or_create_by_review_app_target!(self)
     @task = task_definition.run(self)
     self if @task
   end
@@ -21,10 +22,6 @@ class ReviewAppTarget
   def update
     delete
     create
-  end
-
-  def task_definition
-    @task_definition ||= TaskDefinition.find_by(repository: repository)
   end
 
   def task
