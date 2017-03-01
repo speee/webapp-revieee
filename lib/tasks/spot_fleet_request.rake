@@ -19,6 +19,8 @@ namespace :spotfleet do
       client.describe(args.spot_fleet_request_id)
     end
 
+    # NOTE:
+    # Output SpotFleet Request Result to console in executing rake task
     task set_logging: :environment do
       Rails.logger = Logger.new(STDOUT)
       Rails.logger.level = Logger::DEBUG
