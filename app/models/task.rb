@@ -3,8 +3,11 @@ class Task < ApplicationRecord
   has_many :endpoints, dependent: :destroy
 
   validates :arn, presence: true
-  validates :task_definition, presence: true, uniqueness: { scope: :pr_number }
-  validates :pr_number, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
+  validates :task_definition, presence: true
+  validates :pr_number,
+    presence: true,
+    numericality: { only_integer: true, greater_than_or_equal_to: 1 },
+    uniqueness: { scope: :task_definition }
   validates :endpoints, presence: true
 
   after_initialize :build_endpoints, if: -> { new_record? && endpoints.blank? }
