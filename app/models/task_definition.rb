@@ -47,7 +47,7 @@ class TaskDefinition < ApplicationRecord
       overrides: {
         container_overrides: [
           {
-            name: 'rails',
+            name: 'main',
             environment: [
               {
                 name: 'BRANCH',
