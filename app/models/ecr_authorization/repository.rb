@@ -8,13 +8,13 @@ module ECRAuthorization
     end
 
     def create
-      response = ecs.create_repository({ repository_name: @name })
+      response = ecr.create_repository({ repository_name: @name })
       @registry_id = response.repository.registry_id
       self
     end
 
     def allow_access(user_arn)
-      ecs.set_repository_policy({
+      ecr.set_repository_policy({
         registry_id: @registry_id,
         repository_name: @name,
         policy_text: policy_text(user_arn),

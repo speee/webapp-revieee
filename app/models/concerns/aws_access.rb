@@ -10,4 +10,8 @@ module AwsAccess
   def iam
     @iam ||= Aws::IAM::Client.new(region: Settings.aws.region)
   end
+
+  def ecr
+    @ecr ||= Aws::ECR::Client.new(region: Settings.aws.region)
+  end
 end
