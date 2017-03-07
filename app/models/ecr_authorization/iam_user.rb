@@ -12,7 +12,7 @@ module ECRAuthorization
     end
 
     def join(group)
-      ec2.add_user_to_group(
+      ec2.add_user_to_group({
         group_name: group.name,
         user_name: @name
       })
