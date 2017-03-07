@@ -5,5 +5,9 @@ module ECRAuthorization
     def initialize(group_name)
       @group_name = group_name
     end
+
+    def create
+      ec2.create_group({ group_name: @group_name })
+    end
   end
 end
