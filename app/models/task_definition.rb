@@ -1,4 +1,6 @@
 class TaskDefinition < ApplicationRecord
+  include AwsAccess
+
   has_many :tasks
 
   validates :repository, presence: true, uniqueness: true
@@ -48,9 +50,5 @@ class TaskDefinition < ApplicationRecord
       sort: 'DESC',
       max_results: 1,
     ).dig(:task_definition_arns, 0)
-  end
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new(region: Settings.aws.region)
   end
 end

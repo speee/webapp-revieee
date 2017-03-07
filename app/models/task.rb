@@ -1,4 +1,6 @@
 class Task < ApplicationRecord
+  include AwsAccess
+
   belongs_to :task_definition
   has_many :endpoints, dependent: :destroy
 
@@ -57,13 +59,5 @@ class Task < ApplicationRecord
       tasks: [arn],
       cluster: Settings.aws.ecs.cluster_name,
     ).dig(:tasks, 0)
-  end
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new(region: Settings.aws.region)
-  end
-
-  def ec2
-    @ec2 ||= Aws::EC2::Client.new(region: Settings.aws.region)
   end
 end
