@@ -9,7 +9,7 @@ module ECRAuthorization
     end
 
     def create
-      ec2.create_group({ group_name: @name })
+      iam.create_group({ group_name: @name })
     end
   end
 end

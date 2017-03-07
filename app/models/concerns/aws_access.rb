@@ -6,4 +6,8 @@ module AwsAccess
   def ecs
     @ecs ||= Aws::ECS::Client.new(region: Settings.aws.region)
   end
+
+  def iam
+    @iam ||= Aws::IAM::Client.new(region: Settings.aws.region)
+  end
 end
