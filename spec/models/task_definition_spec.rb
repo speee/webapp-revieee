@@ -1,26 +1,26 @@
 require 'rails_helper'
 
 RSpec.describe TaskDefinition, type: :model do
-  describe '.find_or_create_by_review_app_target!' do
-    subject { TaskDefinition.find_or_create_by_review_app_target!(review_app_target) }
+  describe '.register!' do
+    subject { TaskDefinition.register!(repository, params) }
 
-    let(:review_app_target) { ReviewAppTarget.new(repository: 'test/app') }
+    let(:repository) { 'test/app' }
+    let(:params) { { hoge: :fuga } }
+    let(:response) { { task_definition: { family: 'example' } } }
 
-    context 'when TaskDefinition is already exist' do
-      let!(:task_definition) { FactoryGirl.create(:task_definition, repository: 'test/app', name: 'example') }
-
-      it { is_expected.to eq task_definition }
+    before do
+      expect_any_instance_of(Aws::ECS::Client).to receive(:register_task_definition).with(params).and_return(response)
     end
 
-    context 'when TaskDefinition is not exist' do
-      let(:task_definition_config) { TaskDefinitionConfig.new(content: {}) }
+    context "when same repository's task_definition is already exist" do
+      let!(:task_definition) { FactoryGirl.create(:task_definition, repository: 'test/app', name: 'example') }
 
-      before do
-        allow(TaskDefinitionConfig).to receive(:load_from_review_app_target).and_return(task_definition_config)
-        allow(TaskDefinition).to receive(:register).and_return('test-task-definition')
-      end
+      it { expect { subject }.to raise_error(ActiveRecord::RecordInvalid) }
+    end
 
-      it { is_expected.to have_attributes(repository: 'test/app', name: 'test-task-definition') }
+    context "when same repository's task_definition is not exist" do
+      it { expect { subject }.to change { TaskDefinition.count }.to(1).from(0) }
+      it { is_expected.to have_attributes(repository: 'test/app', name: 'example') }
     end
   end
 end
