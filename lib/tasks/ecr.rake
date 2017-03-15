@@ -25,4 +25,12 @@ namespace :ecr do
       puts user.join(group)
     end
   end
+
+  namespace :repository do
+    desc 'Create ECR Repository ( rails ecr:repository:create[name] )'
+    task :create, [:name] do |task, args|
+      repository = Ecr::Repository.new(args.name)
+      puts repository.create
+    end
+  end
 end
