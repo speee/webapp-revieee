@@ -30,7 +30,8 @@ namespace :ecr do
     desc 'Create ECR Repository ( rails ecr:repository:create[name] )'
     task :create, [:name] => :environment do |task, args|
       repository = Ecr::Repository.new(args.name)
-      puts repository.create
+      repository.create
+      puts repository.name, repository.registry_id
     end
 
     desc 'Allow user access To ECR ( rails ecr:repository:allow_access[user_arn, registry_id, repository_name])'

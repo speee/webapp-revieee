@@ -2,6 +2,7 @@
 module Ecr
   class Repository
     include AwsAccessible
+    attr_reader :name, :registry_id
 
     def initialize(name, registry_id: nil)
       @name = name
