@@ -17,5 +17,12 @@ namespace :ecr do
       response << user.create_access_key
       puts response
     end
+
+    desc 'Add specified Iam User to Iam Group (rails ecr:user:join_group[user_name, group])'
+    task :join_group, [:user_name, :group_name] do |task, args|
+      group = Ecr::IamGroup.new(args.group_name)
+      user = Ecr::IamUser.new(args.user_name)
+      puts user.join(group)
+    end
   end
 end
