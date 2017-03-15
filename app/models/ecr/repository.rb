@@ -3,8 +3,9 @@ module Ecr
   class Repository
     include AwsAccessible
 
-    def initialize(name)
+    def initialize(name, registry_id: nil)
       @name = name
+      @registry_id = registry_id
     end
 
     def create
