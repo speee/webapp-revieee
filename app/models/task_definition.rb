@@ -6,6 +6,17 @@ class TaskDefinition < ApplicationRecord
   validates :repository, presence: true, uniqueness: true
   validates :name, presence: true
 
+  class << self
+    def register!(repository, params)
+      ecs = Aws::ECS::Client.new(region: Settings.aws.region)
+      response = ecs.register_task_definition(params)
+      create!(
+        repository: repository,
+        name: response.dig(:task_definition, :family),
+      )
+    end
+  end
+
   def exist?
     ecs.list_task_definition_families.families.include?(name)
   end
@@ -30,7 +41,7 @@ class TaskDefinition < ApplicationRecord
       overrides: {
         container_overrides: [
           {
-            name: 'rails',
+            name: 'main',
             environment: [
               {
                 name: 'BRANCH',

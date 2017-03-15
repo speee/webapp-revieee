@@ -24,7 +24,7 @@ class ReviewAppTarget
   end
 
   def task_definition
-    @task_definition ||= TaskDefinition.find_by(repository: repository)
+    TaskDefinition.find_by(repository: repository) || create_task_definition!
   end
 
   def task
@@ -33,5 +33,12 @@ class ReviewAppTarget
 
   def cache_clear_url
     "#{target.endpoint}/review_apps/clear"
+  end
+
+  private
+
+  def create_task_definition!
+    loader = TaskDefinitionLoader.new(self)
+    TaskDefinition.register!(repository, loader.load)
   end
 end
