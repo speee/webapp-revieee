@@ -38,5 +38,12 @@ namespace :ecr do
       repository = Ecr::Repository.new(args.repository_name, registry_id: args.registry_id)
       puts repository.allow_access(args.user_arn)
     end
+
+    desc 'Create and set repository policy (rails ecr:repository:create_and_set_user[repository_name, user_arn])'
+    task :create_and_set_user,[:repository_name, :user_arn] do |task, args|
+      repository = Ecr::Repository.new(args.name)
+      repository.create
+      puts repository.allow_access(args.user_arn)
+    end
   end
 end
