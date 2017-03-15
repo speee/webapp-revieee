@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module ECRAuthorization
+module Ecr
   class Repository
     include AwsAccessible
 

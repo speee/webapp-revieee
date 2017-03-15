@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-module ECRAuthorization
+module Ecr
   class IamGroup
     include AwsAccessible
     attr_reader :name
