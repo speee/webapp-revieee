@@ -7,4 +7,15 @@ namespace :ecr do
       puts response
     end
   end
+
+  namespace :user do
+    desc 'Create Iam User to use ECR (rails ecr:user:create[user_name])'
+    task :create, [:name] => :environment do |task, args|
+      user = Ecr::IamUser.new(args.name)
+      response = []
+      response << user.create
+      response << user.create_access_key
+      puts response
+    end
+  end
 end
