@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ECRAuthorization
   class IamGroup
-    include AwsAccess
+    include AwsAccessible
     attr_reader :name
 
     def initialize(name)

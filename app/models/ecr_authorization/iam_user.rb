@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module ECRAuthorization
   class IamUser
-    include AwsAccess
+    include AwsAccessible
 
     def initialize(name)
       @name = name

@@ -1,4 +1,4 @@
-module AwsAccess
+module AwsAccessible
   def ec2
     @ec2 ||= Aws::EC2::Client.new(region: Settings.aws.region)
   end

@@ -1,5 +1,5 @@
 class TaskDefinition < ApplicationRecord
-  include AwsAccess
+  include AwsAccessible
 
   has_many :tasks
 

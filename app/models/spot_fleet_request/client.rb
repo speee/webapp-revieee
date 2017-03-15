@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module SpotFleetRequest
   class Client
-    include AwsAccess
+    include AwsAccessible
 
     def create
       spot_instance = SpotInstance.new

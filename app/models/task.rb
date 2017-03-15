@@ -1,5 +1,5 @@
 class Task < ApplicationRecord
-  include AwsAccess
+  include AwsAccessible
 
   belongs_to :task_definition
   has_many :endpoints, dependent: :destroy
