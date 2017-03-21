@@ -24,21 +24,19 @@ namespace :ecr do
   end
 
   namespace :repository do
-    desc 'Create ECR Repository ( rails ecr:repository:create[name] )'
-    task :create, [:name] => :environment do |task, args|
+    desc 'Create ECR Repository. if you set user_arn parameter, this task set access_policy to Repository (rails ecr:repository:create[name, user_arn(option)] )'
+    task :create, [:name, :user_arn] => :environment do |task, args|
       repository = Ecr::Repository.create(args.name)
       pp repository.name, repository.registry_id
+
+      return if args.user_arn.nil?
+      response = repository.allow_access(args.user_arn)
+      pp response
     end
 
     desc 'Allow user access To ECR ( rails ecr:repository:allow_access[user_arn, registry_id, repository_name])'
     task :allow_access, [:user_arn, :registry_id, :repository_name] => :environment do |task, args|
       repository = Ecr::Repository.new(args.repository_name, args.registry_id)
-      pp repository.allow_access(args.user_arn)
-    end
-
-    desc 'Create and set repository policy (rails ecr:repository:create_and_set_user[repository_name, user_arn])'
-    task :create_and_set_user,[:repository_name, :user_arn] => :environment do |task, args|
-      repository = Ecr::Repository.create(args.repository_name)
       pp repository.allow_access(args.user_arn)
     end
   end
