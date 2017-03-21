@@ -10,11 +10,11 @@ module Ecr
       def create(name)
         response = ecr.create_repository({ repository_name: name })
         registry_id = response.repository.registry_id
-        new(name, registry_id: registry_id)
+        new(name, registry_id)
       end
     end
 
-    def initialize(name, registry_id: nil)
+    def initialize(name, registry_id)
       @name = name
       @registry_id = registry_id
     end
