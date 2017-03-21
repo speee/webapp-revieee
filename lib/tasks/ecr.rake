@@ -29,8 +29,7 @@ namespace :ecr do
   namespace :repository do
     desc 'Create ECR Repository ( rails ecr:repository:create[name] )'
     task :create, [:name] => :environment do |task, args|
-      repository = Ecr::Repository.new(args.name)
-      repository.create
+      repository = Ecr::Repository.create(args.name)
       puts repository.name, repository.registry_id
     end
 
@@ -42,8 +41,7 @@ namespace :ecr do
 
     desc 'Create and set repository policy (rails ecr:repository:create_and_set_user[repository_name, user_arn])'
     task :create_and_set_user,[:repository_name, :user_arn] => :environment do |task, args|
-      repository = Ecr::Repository.new(args.repository_name)
-      repository.create
+      repository = Ecr::Repository.create(args.repository_name)
       puts repository.allow_access(args.user_arn)
     end
   end

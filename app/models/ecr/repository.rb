@@ -2,17 +2,21 @@
 module Ecr
   class Repository
     include AwsAccessible
+    extend AwsAccessible
+
     attr_reader :name, :registry_id
+
+    class << self
+      def create(name)
+        response = ecr.create_repository({ repository_name: name })
+        registry_id = response.repository.registry_id
+        new(name, registry_id: registry_id)
+      end
+    end
 
     def initialize(name, registry_id: nil)
       @name = name
       @registry_id = registry_id
-    end
-
-    def create
-      response = ecr.create_repository({ repository_name: @name })
-      @registry_id = response.repository.registry_id
-      self
     end
 
     def allow_access(user_arn)
