@@ -2,13 +2,17 @@
 module Ecr
   class IamUser
     include AwsAccessible
+    extend AwsAccessible
+
+    class << self
+      def create(name)
+        iam.create_user({ user_name: name })
+        new(name)
+      end
+    end
 
     def initialize(name)
       @name = name
-    end
-
-    def create
-      iam.create_user({ user_name: @name })
     end
 
     def create_access_key

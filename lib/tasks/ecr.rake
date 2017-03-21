@@ -11,11 +11,9 @@ namespace :ecr do
   namespace :user do
     desc 'Create Iam User to use ECR (rails ecr:user:create[user_name])'
     task :create, [:name] => :environment do |task, args|
-      user = Ecr::IamUser.new(args.name)
-      response = []
-      response << user.create
-      response << user.create_access_key
-      pp response
+      user = Ecr::IamUser.create(args.name)
+      response = user.create_access_key
+      pp user, response
     end
 
     desc 'Add specified Iam User to Iam Group (rails ecr:user:join_group[user_name, group])'
