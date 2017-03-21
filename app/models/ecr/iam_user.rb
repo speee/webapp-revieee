@@ -6,13 +6,14 @@ module Ecr
 
     class << self
       def create(name)
-        iam.create_user({ user_name: name })
-        new(name)
+        response = iam.create_user({ user_name: name })
+        new(name, arn: response.user.arn)
       end
     end
 
-    def initialize(name)
+    def initialize(name, arn: nil)
       @name = name
+      @arn = arn
     end
 
     def create_access_key
