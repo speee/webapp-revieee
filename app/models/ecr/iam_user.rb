@@ -4,6 +4,8 @@ module Ecr
     include AwsAccessible
     extend AwsAccessible
 
+    attr_reader :arn
+
     class << self
       def create(name)
         response = iam.create_user({ user_name: name })
