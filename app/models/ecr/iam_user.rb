@@ -2,13 +2,23 @@
 module Ecr
   class IamUser
     include AwsAccessible
+    extend AwsAccessible
 
-    def initialize(name)
-      @name = name
+    attr_reader :arn
+
+    class << self
+      def create(name)
+        response = iam.create_user({ user_name: name })
+        new(name, arn: response.user.arn)
+      end
     end
 
-    def create
-      iam.create_user({ user_name: @name })
+    # NOTE:
+    # arn parameter is only present when called by create method.
+    # Since arn parameter is necessary in ecr.rake tasks
+    def initialize(name, arn: nil)
+      @name = name
+      @arn = arn
     end
 
     def create_access_key
