@@ -29,7 +29,7 @@ namespace :ecr do
       repository = Ecr::Repository.create(args.name)
       pp repository.name, repository.registry_id
 
-      return if args.user_arn.nil?
+      next if args.user_arn.nil?
       response = repository.allow_access(args.user_arn)
       pp response
     end
