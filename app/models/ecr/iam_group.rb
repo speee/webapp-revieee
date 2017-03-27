@@ -8,7 +8,7 @@ module Ecr
 
     class << self
       def create(name)
-        iam.create_group({ group_name: @name })
+        iam.create_group({ group_name: name })
       end
     end
 
