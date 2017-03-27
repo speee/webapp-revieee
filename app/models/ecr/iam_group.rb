@@ -9,6 +9,7 @@ module Ecr
     class << self
       def create(name)
         iam.create_group({ group_name: name })
+        new(name)
       end
     end
 
