@@ -13,6 +13,9 @@ module Ecr
       end
     end
 
+    # NOTE:
+    # arn parameter is only present when called by create method.
+    # Since arn parameter is necessary in ecr.rake tasks
     def initialize(name, arn: nil)
       @name = name
       @arn = arn
