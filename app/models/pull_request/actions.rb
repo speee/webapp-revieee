@@ -33,4 +33,12 @@ class PullRequest::Actions
   def target
     @target ||= ReviewAppTarget.new(repository: payload.head_repository, branch: payload.head_branch, pr_number: payload.pr_number)
   end
+
+  def add_comment(message)
+    PullRequest::Comment.new.add(
+      repository: payload.head_repository,
+      pr_number: payload.pr_number,
+      message: message,
+    )
+  end
 end
