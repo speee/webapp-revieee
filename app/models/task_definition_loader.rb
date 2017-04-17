@@ -23,6 +23,6 @@ class TaskDefinitionLoader
   private
 
   def parse_response(response)
-    YAML.load(Base64.decode64(response[:content])).symbolize_keys
+    YAML.load(Base64.decode64(response[:content])).deep_symbolize_keys
   end
 end
