@@ -44,7 +44,8 @@ module SpotFleetRequest
         device_index: 0,
         associate_public_ip_address: true,
         subnet_id: subnet_id,
-        groups: [ group_id ]
+        groups: [ group_id ],
+        delete_on_termination: true,
       }
     end
 
