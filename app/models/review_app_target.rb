@@ -13,6 +13,8 @@ class ReviewAppTarget
   end
 
   def delete
+    return if task.nil?
+
     task.stop
     task.destroy
     self
