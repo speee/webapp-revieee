@@ -17,6 +17,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'aws-sdk', '~> 2'
 gem 'octokit', '~> 4.0'
 gem 'config'
+gem 'sentry-raven'
 
 group :development, :test do
   gem 'pry-rails'
