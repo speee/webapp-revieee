@@ -34,7 +34,7 @@ class ReviewAppTarget
   end
 
   def cache_clear_url
-    "#{target.endpoint}/review_apps/clear"
+    "#{task.endpoint}/review_apps/clear"
   end
 
   private
