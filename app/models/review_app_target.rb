@@ -33,8 +33,10 @@ class ReviewAppTarget
     @task ||= Task.find_by_review_app_target(self)
   end
 
-  def cache_clear_url
-    "#{task.endpoint}/review_apps/clear"
+  def cache_clear_urls
+    task.endpoints.map do |endpoint|
+      "#{endpoint.url}/review_apps/clear"
+    end
   end
 
   private
