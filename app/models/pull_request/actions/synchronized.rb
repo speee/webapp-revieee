@@ -1,10 +1,9 @@
 class PullRequest::Actions::Synchronized < PullRequest::Actions
   def handle
-    return unless target.update
-
     target.cache_clear_urls.each do |url|
       Net::HTTP.get URI.parse(url)
     end
+    return unless target.update
 
     add_comment(message)
   end
