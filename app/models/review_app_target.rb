@@ -35,7 +35,7 @@ class ReviewAppTarget
 
   def cache_clear_urls
     task.endpoints.map do |endpoint|
-      "#{endpoint.url}/review_apps/clear"
+      URI(endpoint.url).merge('/review_apps/clear')
     end
   end
 
