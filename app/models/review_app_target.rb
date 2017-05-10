@@ -33,9 +33,9 @@ class ReviewAppTarget
     @task ||= Task.find_by_review_app_target(self)
   end
 
-  def cache_clear_urls
-    task.endpoints.map do |endpoint|
-      URI(endpoint.url).merge('/review_apps/clear')
+  def clear_nginx_cache
+    cache_clear_urls.each do |url|
+      Net::HTTP.get url
     end
   end
 
@@ -44,5 +44,11 @@ class ReviewAppTarget
   def create_task_definition!
     loader = TaskDefinitionLoader.new(self)
     TaskDefinition.register!(repository, loader.load)
+  end
+
+  def cache_clear_urls
+    task.endpoints.map do |endpoint|
+      URI(endpoint.url).merge('/review_apps/clear')
+    end
   end
 end
