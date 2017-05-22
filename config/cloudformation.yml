@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: revieee development settings
+Resources:
+
+# VPC
+## VPC Base
+  RevieeeVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.1.0.0/16
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+      InstanceTenancy: default
+      Tags:
+       - Key: Name
+         Value: RevieeeDevelopmentVPC
+## Revieee Internet Gateway
+  RevieeeIGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: RevieeeIGW
+## Attach Internet Gateway To VPC
+  AttachIGWtoVPC:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref RevieeeIGW
+      VpcId: !Ref RevieeeVPC
+## Revieee Nat Gateway EIP
+  RevieeeEIPforNGW:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+## Revieee Nat Gateway
+  RevieeeNGW:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        !GetAtt RevieeeEIPforNGW.AllocationId
+      SubnetId:
+        !Ref RevieeeAppSubnet1a #TODO: ここに当てはまるべきIDを、ちゃんと考える
+
+# Subnet
+## Webhook Server
+### Subnet 1a
+  RevieeeAppSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.1.192.0/26
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: RevieeeAppSubnet1a
+### Subnet 1c
+  RevieeeAppSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.1.192.64/26
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: RevieeeAppSubnet1c
+
+# Route Table
+## Public Route Table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+  RouteAddInternet:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId: !Ref RevieeeIGW
+      RouteTableId: !Ref PublicRouteTable
+### App Server Route Table Association
+  AssociateAppSubnet1aToPublicRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref RevieeeAppSubnet1a
+  AssociateAppSubnet1cToPublicRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref RevieeeAppSubnet1c
