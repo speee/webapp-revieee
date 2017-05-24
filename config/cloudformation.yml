@@ -65,7 +65,29 @@ Resources:
       Tags:
         - Key: Name
           Value: RevieeeAppSubnet1c
-
+## ECS Container Instance
+### Subnet1a
+  ContainerInstanceSubnet1a:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      AvailabilityZone: ap-northeast-1a
+      CidrBlock: 10.1.194.0/26
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: ContainerInstanceSubnet1a
+### Subnet1c
+  ContainerInstanceSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      AvailabilityZone: ap-northeast-1c
+      CidrBlock: 10.1.194.64/26
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: ContainerInstanceSubnet1c
 # Route Table
 ## Public Route Table
   PublicRouteTable:
@@ -92,3 +114,14 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref RevieeeAppSubnet1c
+### Container Instance Route Table Association
+  AssociateContainerInstanceSubnet1aToPublicRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref ContainerInstanceSubnet1a
+  AssociateContainerInstanceSubnet1cToPublicRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref ContainerInstanceSubnet1c
