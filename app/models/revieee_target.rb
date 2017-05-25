@@ -1,4 +1,4 @@
-class ReviewAppTarget
+class RevieeeTarget
   include ActiveModel::Model
 
   attr_accessor :repository, :branch, :pr_number
@@ -30,7 +30,7 @@ class ReviewAppTarget
   end
 
   def task
-    @task ||= Task.find_by_review_app_target(self)
+    @task ||= Task.find_by_revieee_target(self)
   end
 
   def clear_nginx_cache
@@ -48,7 +48,7 @@ class ReviewAppTarget
 
   def cache_clear_urls
     task.endpoints.map do |endpoint|
-      URI(endpoint.url).merge('/review_apps/clear')
+      URI(endpoint.url).merge('/revieee/clear')
     end
   end
 end

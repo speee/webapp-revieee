@@ -15,10 +15,10 @@ class Task < ApplicationRecord
   after_initialize :build_endpoints, if: -> { new_record? && endpoints.blank? }
 
   class << self
-    def find_by_review_app_target(review_app_target)
+    def find_by_revieee_target(revieee_target)
       joins(:task_definition)
-        .merge(TaskDefinition.where(repository: review_app_target.repository))
-        .find_by(pr_number: review_app_target.pr_number)
+        .merge(TaskDefinition.where(repository: revieee_target.repository))
+        .find_by(pr_number: revieee_target.pr_number)
     end
   end
 

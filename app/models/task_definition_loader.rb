@@ -1,17 +1,17 @@
 class TaskDefinitionLoader
   CONFIG_FILE = 'task_definition.yml'.freeze
 
-  def initialize(review_app_target)
-    @review_app_target = review_app_target
+  def initialize(revieee_target)
+    @revieee_target = revieee_target
   end
 
   def load
     github = Octokit::Client.new(access_token: Settings.github.access_token)
     begin
       response = github.contents(
-        @review_app_target.repository,
+        @revieee_target.repository,
         path: CONFIG_FILE,
-        ref: @review_app_target.branch,
+        ref: @revieee_target.branch,
       )
     rescue Octokit::NotFound
       {}
