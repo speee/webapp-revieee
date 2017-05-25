@@ -48,7 +48,7 @@ class RevieeeTarget
 
   def cache_clear_urls
     task.endpoints.map do |endpoint|
-      URI(endpoint.url).merge('/review_apps/clear')
+      URI(endpoint.url).merge('/revieee/clear')
     end
   end
 end
