@@ -4,8 +4,8 @@ RSpec.describe TaskDefinitionLoader, type: :model do
   describe '#load' do
     subject { task_definition_loader.load }
 
-    let(:task_definition_loader) { TaskDefinitionLoader.new(review_app_target) }
-    let(:review_app_target) { ReviewAppTarget.new(repository: 'test/app', branch: 'patch') }
+    let(:task_definition_loader) { TaskDefinitionLoader.new(revieee_target) }
+    let(:revieee_target) { RevieeeTarget.new(repository: 'test/app', branch: 'patch') }
 
     let(:response) { { content: Base64.encode64('task_definition: test') } }
 

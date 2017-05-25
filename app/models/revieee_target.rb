@@ -1,4 +1,4 @@
-class ReviewAppTarget
+class RevieeeTarget
   include ActiveModel::Model
 
   attr_accessor :repository, :branch, :pr_number
@@ -30,7 +30,7 @@ class ReviewAppTarget
   end
 
   def task
-    @task ||= Task.find_by_review_app_target(self)
+    @task ||= Task.find_by_revieee_target(self)
   end
 
   def clear_nginx_cache

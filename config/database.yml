@@ -8,16 +8,16 @@ default: &default
 
 development:
   <<: *default
-  database: review_apps_development
+  database: revieee_development
   host: 127.0.0.1
 
 test:
   <<: *default
-  database: review_apps_test
+  database: revieee_test
   host: 127.0.0.1
 
 production:
   <<: *default
-  database: review_apps_production
-  username: review_apps
-  password: <%= ENV['REVIEW_APPS_DATABASE_PASSWORD'] || Settings.database&.password %>
+  database: revieee_production
+  username: revieee
+  password: <%= ENV['REVIEEE_DATABASE_PASSWORD'] || Settings.database&.password %>

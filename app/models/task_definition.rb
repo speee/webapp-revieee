@@ -21,12 +21,12 @@ class TaskDefinition < ApplicationRecord
     ecs.list_task_definition_families.families.include?(name)
   end
 
-  def run(review_app_target)
-    task_arn = run_task(review_app_target)
+  def run(revieee_target)
+    task_arn = run_task(revieee_target)
     if task_arn
       task = tasks.build(
         arn: task_arn,
-        pr_number: review_app_target.pr_number,
+        pr_number: revieee_target.pr_number,
       )
       task if task.save
     end
@@ -34,7 +34,7 @@ class TaskDefinition < ApplicationRecord
 
   private
 
-  def run_task(review_app_target)
+  def run_task(revieee_target)
     ecs.run_task(
       cluster: Settings.aws.ecs.cluster_name,
       task_definition: latest_arn,
@@ -45,7 +45,7 @@ class TaskDefinition < ApplicationRecord
             environment: [
               {
                 name: 'BRANCH',
-                value: review_app_target.branch,
+                value: revieee_target.branch,
               },
             ],
           },
