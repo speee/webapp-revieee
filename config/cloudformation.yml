@@ -125,3 +125,33 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref ContainerInstanceSubnet1c
+
+# SecurityGroup
+## AppServer Security Group
+  AppServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: allow connections from specified CIDR ranges
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: !Ref AppServerSSHPort
+        ToPort: !Ref AppServerSSHPort
+        CidrIp: !Ref CompanyIp
+
+# Parameter
+Parameters:
+  AppServerSSHPort:
+    Default: 22
+    Type: Number
+    NoEcho: true
+  CompanyIp:
+    Type: String
+    NoEcho: true
