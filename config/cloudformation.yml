@@ -128,10 +128,10 @@ Resources:
 
 # SecurityGroup
 ## AppServer Security Group
-  AppServerSecurityGroup:
+  RevieeeAppServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: allow connections from specified CIDR ranges
+      GroupDescription: "Security Group for Revieee App Server"
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
@@ -142,13 +142,36 @@ Resources:
         ToPort: 443
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
-        FromPort: !Ref AppServerSSHPort
-        ToPort: !Ref AppServerSSHPort
+        FromPort: !Ref SSHPort
+        ToPort: !Ref SSHPort
         CidrIp: !Ref CompanyIp
+      GroupName: RevieeeAppServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: RevieeeAppServerSecurityGroup
+
+## ECS Container Instance
+  ContainerInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Security Group for Revieee Container Instance"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        SourceSecurityGroupName: !Ref RevieeeAppServerSecurityGroup
+      - IpProtocol: tcp
+        FromPort: !Ref SSHPort
+        ToPort: !Ref SSHPort
+        CidrIp: !Ref CompanyIp
+      GroupName: RevieeeContainerInstanceSecurityGroup
+      Tags:
+        - Key: Name
+          Value: RevieeeContainerInstanceSecurityGroup
 
 # Parameter
 Parameters:
-  AppServerSSHPort:
+  SSHPort:
     Default: 22
     Type: Number
     NoEcho: true
