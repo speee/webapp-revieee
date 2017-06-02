@@ -24,5 +24,10 @@ module Revieee
 
     config.time_zone = 'Asia/Tokyo'
     config.active_record.default_timezone = :local
+
+    Raven.configure do |config|
+      config.dsn = Settings.raven.try(&:dsn).to_s
+      config.environments = ['production']
+    end
   end
 end
