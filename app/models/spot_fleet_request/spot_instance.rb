@@ -8,6 +8,7 @@ module SpotFleetRequest
     INSTANCE_TYPE = Settings.spot_fleet.instance_type
     KEY_NAME = Settings.spot_fleet.key_name
     SUBNET_ID = Settings.spot_fleet.subnet_id
+    VOLUME_SIZE = Settings.spot_fleet.volume_size
     CLUSTER_NAME = Settings.spot_fleet.cluster_name
 
     attr_reader :iam_instance_profile, :image_id, :instance_type
@@ -32,12 +33,24 @@ module SpotFleetRequest
         instance_type: instance_type,
         key_name: key_name,
         placement: { availability_zone: availability_zone },
+        block_device_mappings: [ block_device_mapping ],
         network_interfaces: [ network_interfaces ],
         user_data: user_data
       }
     end
 
     private
+
+    def block_device_mapping
+      {
+        device_name: '/dev/xvda',
+        ebs: {
+          volume_type: 'gp2',
+          volume_size: VOLUME_SIZE,
+          delete_on_termination: true,
+        },
+      }
+    end
 
     def network_interfaces
       {
