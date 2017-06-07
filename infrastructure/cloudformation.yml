@@ -157,8 +157,8 @@ Resources:
       GroupDescription: "Security Group for Revieee Container Instance"
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
+        FromPort: 32768
+        ToPort: 61000
         SourceSecurityGroupName: !Ref RevieeeAppServerSecurityGroup
       - IpProtocol: tcp
         FromPort: !Ref SSHPort
