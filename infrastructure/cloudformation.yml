@@ -145,7 +145,7 @@ Resources:
         FromPort: !Ref SSHPort
         ToPort: !Ref SSHPort
         CidrIp: !Ref AcceptCidrIp
-      GroupName: RevieeeAppServerSecurityGroup
+      GroupName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeAppServerSecurityGroup ] ]
       Tags:
         - Key: Name
           Value: RevieeeAppServerSecurityGroup
@@ -164,7 +164,7 @@ Resources:
         FromPort: !Ref SSHPort
         ToPort: !Ref SSHPort
         CidrIp: !Ref AcceptCidrIp
-      GroupName: RevieeeContainerInstanceSecurityGroup
+      GroupName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeContainerInstanceSecurityGroup ] ]
       Tags:
         - Key: Name
           Value: RevieeeContainerInstanceSecurityGroup
