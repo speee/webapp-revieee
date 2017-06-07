@@ -27,19 +27,6 @@ Resources:
     Properties:
       InternetGatewayId: !Ref RevieeeIGW
       VpcId: !Ref RevieeeVPC
-## Revieee Nat Gateway EIP
-  RevieeeEIPforNGW:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-## Revieee Nat Gateway
-  RevieeeNGW:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId:
-        !GetAtt RevieeeEIPforNGW.AllocationId
-      SubnetId:
-        !Ref RevieeeAppSubnet1a #TODO: ここに当てはまるべきIDを、ちゃんと考える
 
 # Subnet
 ## Webhook Server
