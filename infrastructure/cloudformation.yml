@@ -144,7 +144,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: !Ref SSHPort
         ToPort: !Ref SSHPort
-        CidrIp: !Ref CompanyIp
+        CidrIp: !Ref AcceptCidrIp
       GroupName: RevieeeAppServerSecurityGroup
       Tags:
         - Key: Name
@@ -163,7 +163,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: !Ref SSHPort
         ToPort: !Ref SSHPort
-        CidrIp: !Ref CompanyIp
+        CidrIp: !Ref AcceptCidrIp
       GroupName: RevieeeContainerInstanceSecurityGroup
       Tags:
         - Key: Name
@@ -175,6 +175,6 @@ Parameters:
     Default: 22
     Type: Number
     NoEcho: true
-  CompanyIp:
+  AcceptCidrIp:
     Type: String
     NoEcho: true
