@@ -158,6 +158,11 @@ Resources:
         - Key: Name
           Value: RevieeeContainerInstanceSecurityGroup
 
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
+
 # Parameter
 Parameters:
   SSHPort:
@@ -165,3 +170,7 @@ Parameters:
     Type: Number
   AcceptCidrIp:
     Type: String
+
+Outputs:
+  EcsClusterName:
+    Value: !Ref EcsCluster
