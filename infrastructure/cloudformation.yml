@@ -163,7 +163,5 @@ Parameters:
   SSHPort:
     Default: 22
     Type: Number
-    NoEcho: true
   AcceptCidrIp:
     Type: String
-    NoEcho: true
