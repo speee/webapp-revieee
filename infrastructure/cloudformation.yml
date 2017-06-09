@@ -163,9 +163,31 @@ Resources:
     Properties:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
+  EndpointInstanceIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeEndpointInstanceIamRole ] ]
+
+  EndpointInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EndpointInstanceIamRole
+
   EndpointInstance:
     Type: AWS::EC2::Instance
     Properties:
+      IamInstanceProfile: !Ref EndpointInstanceProfile
       ImageId: ami-923d12f5
       InstanceType: t2.micro
       SecurityGroupIds:
