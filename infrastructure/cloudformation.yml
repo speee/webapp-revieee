@@ -190,6 +190,7 @@ Resources:
       IamInstanceProfile: !Ref EndpointInstanceProfile
       ImageId: ami-923d12f5
       InstanceType: t2.micro
+      KeyName: !If [ SSHKeySpecified, !Ref SSHKey, !Ref "AWS::NoValue" ]
       SecurityGroupIds:
         - !GetAtt RevieeeAppServerSecurityGroup.GroupId
       SubnetId: !Ref RevieeeAppSubnet1c
@@ -203,8 +204,15 @@ Parameters:
   SSHPort:
     Default: 22
     Type: Number
+  SSHKey:
+    Default: ""
+    Type: String
   AcceptCidrIp:
     Type: String
+
+Conditions:
+  SSHKeySpecified:
+    !Not [ !Equals [ !Ref SSHKey, "" ] ]
 
 Outputs:
   EcsClusterName:
