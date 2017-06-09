@@ -163,6 +163,19 @@ Resources:
     Properties:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
+  EndpointInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-923d12f5
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !GetAtt RevieeeAppServerSecurityGroup.GroupId
+      SubnetId: !Ref RevieeeAppSubnet1c
+      Tags:
+        - Key: Name
+          Value: RevieeeEndpointInstance
+      # UserData: [TODO] run itamae
+
 # Parameter
 Parameters:
   SSHPort:
