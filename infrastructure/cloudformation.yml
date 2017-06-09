@@ -118,6 +118,7 @@ Resources:
   RevieeeAppServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !Ref RevieeeVPC
       GroupDescription: "Security Group for Revieee App Server"
       SecurityGroupIngress:
       - IpProtocol: tcp
@@ -141,12 +142,13 @@ Resources:
   ContainerInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
+      VpcId: !Ref RevieeeVPC
       GroupDescription: "Security Group for Revieee Container Instance"
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 32768
         ToPort: 61000
-        SourceSecurityGroupName: !Ref RevieeeAppServerSecurityGroup
+        SourceSecurityGroupId: !Ref RevieeeAppServerSecurityGroup
       - IpProtocol: tcp
         FromPort: !Ref SSHPort
         ToPort: !Ref SSHPort
