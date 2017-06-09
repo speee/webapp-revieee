@@ -5,20 +5,20 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
-/.bundle
+application/.bundle
 
 # Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
-!/log/.keep
-!/tmp/.keep
+application/log/*
+application/tmp/*
+!application/log/.keep
+!application/tmp/.keep
 
 # Ignore Byebug command history file.
 .byebug_history
 
-config/settings.local.yml
-config/settings/*.local.yml
-config/environments/*.local.yml
+application/config/settings.local.yml
+application/config/settings/*.local.yml
+application/config/environments/*.local.yml
 
 # Ignore envrc
 /.envrc
