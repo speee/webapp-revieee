@@ -250,12 +250,33 @@ Resources:
         RequestTemplates:
           application/json: !Sub
             - |-
+              #set( $event = $input.params().header.get('X-GitHub-Event') )
+              #set( $action = $input.path('$.action') )
+              #set( $prNumber = $input.path('$.number') )
+              #set( $headRepository = $input.path('$.pull_request.head.repo.full_name') )
+              #set( $headBranch = $input.path('$.pull_request.head.ref') )
+              #set( $baseRepository = $input.path('$.pull_request.base.repo.full_name') )
+              #set( $baseBranch = $input.path('$.pull_request.base.ref') )
+              #set( $prId = $input.path('$.pull_request.id') )
+              #set( $name = "$!{headRepository}-$!{prNumber}-$prId" )
+              #set( $name = $name.replace("/", "-") )
               {
-                "input": "{}",
-                "name": "Hello",
+                "input": "${input}",
+                "name": "$name",
                 "stateMachineArn": "${stateMachineArn}"
               }
-            - { stateMachineArn: !Ref StateMachineCreate }
+            - input: !Join
+                - " "
+                - - "{"
+                  - "\\\"event\\\": \\\"$event\\\","
+                  - "\\\"action\\\": \\\"$action\\\","
+                  - "\\\"prNumber\\\": \\\"$prNumber\\\","
+                  - "\\\"headRepository\\\": \\\"$headRepository\\\","
+                  - "\\\"headBranch\\\": \\\"$headBranch\\\","
+                  - "\\\"baseRepository\\\": \\\"$baseRepository\\\","
+                  - "\\\"baseBranch\\\": \\\"$baseBranch\\\""
+                  - "}"
+              stateMachineArn: !Ref StateMachineCreate
         Type: AWS
         Uri: !Join [ "", [ "arn:aws:apigateway:", !Ref "AWS::Region", ":states:action/StartExecution" ] ]
         Credentials: !GetAtt ApiRole.Arn
