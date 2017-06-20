@@ -1,0 +1,23 @@
+{
+  "name": "run-ecs-task",
+  "version": "0.0.1",
+  "description": "Lambda function that to run ECS Task",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rm -rf ./built"
+  },
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/speee/webapp-revieee"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "0.0.12",
+    "@types/node": "^7.0.31",
+    "aws-sdk": "^2.71.0",
+    "tslint": "^5.4.3",
+    "typescript": "^2.3.4"
+  }
+}
