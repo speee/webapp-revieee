@@ -322,17 +322,50 @@ Resources:
       DefinitionString: !Sub
         - |-
           {
-            "Comment": "Run ECS Task",
-            "StartAt": "RunEcsTask",
+            "Comment": "Incomming Webhook",
+            "StartAt": "ChoiceEvent",
             "States": {
+              "ChoiceEvent": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.event",
+                    "StringEquals": "pull_request",
+                    "Next": "ChoiceAction"
+                  }
+                ],
+                "Default": "UnsupportedEvent"
+              },
+              "ChoiceAction": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.action",
+                    "StringEquals": "opened",
+                    "Next": "RunEcsTask"
+                  }
+                ],
+                "Default": "UnsupportedAction"
+              },
               "RunEcsTask": {
                 "Type": "Task",
                 "Resource": "${taskArn}",
-                "End": true
+                "Next": "Succeed"
+              },
+              "Succeed": {
+                "Type": "Succeed"
+              },
+              "UnsupportedEvent": {
+                "Type": "Fail",
+                "Error": "UnsupportedEvent"
+              },
+              "UnsupportedAction": {
+                "Type": "Fail",
+                "Error": "UnsupportedAction"
               }
             }
           }
-        - { "taskArn": !Ref RunEcsTaskFunction }
+        - { "taskArn": !GetAtt RunEcsTaskFunction.Arn }
       RoleArn: !GetAtt StateMachineRole.Arn
 
   # ------ /StepFunctions ------
