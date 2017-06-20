@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
 Description: revieee development settings
 Resources:
 
@@ -284,26 +285,73 @@ Resources:
                 - states.ap-northeast-1.amazonaws.com
             Action:
               - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "lambda:InvokeFunction"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", StatesExecutionPolicy ] ]
       RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeStateMachineRole ] ]
 
   StateMachineCreate:
     Type: AWS::StepFunctions::StateMachine
     Properties:
-      DefinitionString: |-
-        {
-          "Comment": "Run ECS Task",
-          "StartAt": "RunEcsTask",
-          "States": {
-            "RunEcsTask": {
-              "Type": "Pass",
-              "Result": "Hello World!",
-              "End": true
+      DefinitionString: !Sub
+        - |-
+          {
+            "Comment": "Run ECS Task",
+            "StartAt": "RunEcsTask",
+            "States": {
+              "RunEcsTask": {
+                "Type": "Task",
+                "Resource": "${taskArn}",
+                "End": true
+              }
             }
           }
-        }
+        - { "taskArn": !Ref RunEcsTaskFunction }
       RoleArn: !GetAtt StateMachineRole.Arn
 
   # ------ /StepFunctions ------
+
+  # ------ Lambda ------
+
+  RunEcsTaskFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "ecs:RunTask"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", RunEcsTaskFunctionPolicy ] ]
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeRunEcsTaskFunctionRole ] ]
+
+  RunEcsTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: ./functions/RunEcsTask/built/
+      Role: !GetAtt RunEcsTaskFunctionRole.Arn
+
+  # ------ /Lambda ------
 
 # Parameter
 Parameters:

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2015",
+        "noImplicitAny": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "outDir": "./built",
+        "allowJs": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}
