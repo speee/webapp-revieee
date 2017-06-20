@@ -164,6 +164,7 @@ Resources:
     Properties:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
+# SpotFleet
   EcsSpotFleetRequest:
     Type: AWS::EC2::SpotFleet
     Properties:
@@ -185,7 +186,7 @@ Resources:
               - Ref: InstanceType
               - Arch
           SubnetId:
-            Ref: Subnet1
+            Ref: ContainerInstanceSubnet1a
           WeightedCapacity: '8'
 
   EndpointInstanceIamRole:
