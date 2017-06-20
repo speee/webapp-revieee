@@ -178,7 +178,13 @@ Resources:
           ImageId: 'ami-3a000e5d'
           SubnetId:
             Ref: ContainerInstanceSubnet1a
-          WeightedCapacity: '8'
+          WeightedCapacity: '4'
+        - EbsOptimizes: 'false'
+          InstanceType: 'm3.large'
+          ImageId: 'ami-3a000e5d'
+          SubnetId:
+            Ref: ContainerInstanceSubnet1c
+          WeightedCapacity: '1'
 
   EndpointInstanceIamRole:
     Type: AWS::IAM::Role
