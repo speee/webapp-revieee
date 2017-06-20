@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if [ -z "$BUCKET_NAME" ]; then
+    echo 'BUCKET_NAME is required'
+    exit 1
+fi
+
+if [ -z "$STACK_NAME" ]; then
+    echo 'STACK_NAME is required'
+    exit 1
+fi
+
+TEMPLATE_FILE=cloudformation.yml
+
+# Move project root
+cd "$(dirname "$(perl -e 'use Cwd "abs_path";print abs_path(shift)' "$0")")/.." || exit 1
+
+sh -c 'cd ./functions/RunEcsTask && npm install && npm run build && cp -rf ./node_modules ./built/'
+
+mkdir -p ./built
+
+aws cloudformation package \
+   --template-file "$TEMPLATE_FILE" \
+   --output-template-file ./built/cloudformation.yml \
+   --s3-bucket "$BUCKET_NAME"
+
+aws cloudformation deploy \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --template-file built/cloudformation.yml \
+    --stack-name "$STACK_NAME"
