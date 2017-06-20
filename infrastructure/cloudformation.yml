@@ -170,21 +170,12 @@ Resources:
     Properties:
       SpotFleetRequestConfigData:
         IamFleetRole: !GetAtt [IAMFleetRole, Arn]
-        SpotPrice: '1000'
-        TargetCapacity:
-          Ref: TargetCapacity
+        SpotPrice: '0.139'
+        TargetCapacity: '2'
         LaunchSpecifications:
         - EbsOptimized: 'false'
-          InstanceType:
-            Ref: InstanceType
-          ImageId:
-            Fn::FindInMap:
-            - AWSRegionArch2AMI
-            - Ref: AWS::Region
-            - Fn::FindInMap:
-              - AWSInstanceType2Arch
-              - Ref: InstanceType
-              - Arch
+          InstanceType: 'm4.large'
+          ImageId: 'ami-3a000e5d'
           SubnetId:
             Ref: ContainerInstanceSubnet1a
           WeightedCapacity: '8'
