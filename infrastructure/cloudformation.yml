@@ -199,6 +199,112 @@ Resources:
           Value: RevieeeEndpointInstance
       # UserData: [TODO] run itamae
 
+  # ------ API Gateway ------
+
+  ApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "states:*"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", AWSStepFunctionsFullAccess ] ]
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApiRole ] ]
+
+  RevieeeApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApi ] ]
+  RevieeeApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      ParentId: !GetAtt RevieeeApi.RootResourceId
+      PathPart: "stage"
+  RevieeeApiCreateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      ResourceId: !Ref RevieeeApiResource
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: !Sub
+            - |-
+              {
+                "input": "{}",
+                "name": "Hello",
+                "stateMachineArn": "${stateMachineArn}"
+              }
+            - { stateMachineArn: !Ref StateMachineCreate }
+        Type: AWS
+        Uri: !Join [ "", [ "arn:aws:apigateway:", !Ref "AWS::Region", ":states:action/StartExecution" ] ]
+        Credentials: !GetAtt ApiRole.Arn
+      MethodResponses:
+        - StatusCode: 200
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: RevieeeApiCreateMethod
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      StageName: pub
+
+  # ------ /API Gateway ------
+
+  # ------ StepFunctions ------
+
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - states.ap-northeast-1.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeStateMachineRole ] ]
+
+  StateMachineCreate:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: |-
+        {
+          "Comment": "Run ECS Task",
+          "StartAt": "RunEcsTask",
+          "States": {
+            "RunEcsTask": {
+              "Type": "Pass",
+              "Result": "Hello World!",
+              "End": true
+            }
+          }
+        }
+      RoleArn: !GetAtt StateMachineRole.Arn
+
+  # ------ /StepFunctions ------
+
 # Parameter
 Parameters:
   SSHPort:
