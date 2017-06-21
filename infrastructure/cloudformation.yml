@@ -170,9 +170,12 @@ Resources:
     Properties:
       SpotFleetRequestConfigData:
         IamFleetRole: !GetAtt FleetIAMRole.Arn
-        SpotPrice: '0.139'
-        TargetCapacity: '2'
+        SpotPrice: !Ref SpotPrice
+        TargetCapacity: !Ref TargetCapacity
         LaunchSpecifications:
+        # NOTE:
+        # If you want to use other type of ec2 instances,
+        # fix these parameters
         - EbsOptimized: 'false'
           InstanceType: 'm4.large'
           ImageId: 'ami-3a000e5d'
@@ -404,6 +407,13 @@ Parameters:
     Type: String
   AcceptCidrIp:
     Type: String
+# Parameters for SpotFleetRequest
+  SpotPrice:
+    Default: 0.139
+    Type: Number
+  TargetCapacity:
+    Default: 2
+    Type: Number
 
 Conditions:
   SSHKeySpecified:
