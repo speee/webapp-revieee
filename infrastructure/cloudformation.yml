@@ -196,9 +196,11 @@ Resources:
             Effect: Allow
             Principal:
               Service:
-                -
+                - ec2.amazonaws.com
             Action:
-              -
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::951787653356:role/revieee-spot-fleeet-role'
       RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
 
 #------- SpotFleet/ --------#
