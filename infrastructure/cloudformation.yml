@@ -179,15 +179,36 @@ Resources:
         - EbsOptimized: 'false'
           InstanceType: 'm4.large'
           ImageId: 'ami-3a000e5d'
-          SubnetId:
-            Ref: ContainerInstanceSubnet1a
           WeightedCapacity: '4'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+          NetworkInterfaces:
+            AssociatePublicIpAddress: ture
+            DeviceIndex: 0
+            SubnetId: !Ref ContainerInstanceSubnet1a
+            Groups:
+              - !GetAtt ContainerInstanceSecurityGroup.GroupId
+            DeleteOnTermination: true
+
         - EbsOptimizes: 'false'
           InstanceType: 'm3.large'
           ImageId: 'ami-3a000e5d'
           SubnetId:
             Ref: ContainerInstanceSubnet1c
           WeightedCapacity: '1'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+          NetworkInterfaces:
+            AssociatePublicIpAddress: ture
+            DeviceIndex: 0
+            SubnetId: !Ref ContainerInstanceSubnet1a
+            Groups:
+              - !GetAtt ContainerInstanceSecurityGroup.GroupId
+            DeleteOnTermination: true
 
   FleetIAMRole:
     Type: AWS::IAM::Role
