@@ -31,7 +31,7 @@ RUN cd /usr/local/src/revieee_nginx && sh build.sh && make install
 EXPOSE 80
 EXPOSE 443
 
-ONBUILD ADD docker/hook /usr/local/nginx/hook
+ONBUILD ADD hook /usr/local/nginx/hook
 ONBUILD ADD conf /usr/local/nginx/conf
 ONBUILD ADD conf/nginx.conf /usr/local/nginx/conf/nginx.conf
 
