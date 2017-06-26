@@ -1,0 +1,13 @@
+version: '3'
+services:
+  nginx_mruby:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: revieee_nginx
+    container_name: revieee_nginx_container
+    volumes:
+      - ./docker/conf:/usr/local/nginx/conf
+      - ./docker/hook:/usr/local/nginx/hook
+    ports:
+      - 80:80
