@@ -224,7 +224,7 @@ Resources:
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
-        - 'arn:aws:iam::951787653356:role/revieee-spot-fleeet-role'
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
       RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
 
 #------- SpotFleet/ --------#
