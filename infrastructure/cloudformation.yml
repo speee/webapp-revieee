@@ -184,13 +184,6 @@ Resources:
             Fn::Base64: !Sub |
               #!/bin/bash
               echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-          NetworkInterfaces:
-            AssociatePublicIpAddress: ture
-            DeviceIndex: 0
-            SubnetId: !Ref ContainerInstanceSubnet1a
-            Groups:
-              - !GetAtt ContainerInstanceSecurityGroup.GroupId
-            DeleteOnTermination: true
 
         - EbsOptimizes: 'false'
           InstanceType: 'm3.large'
@@ -202,13 +195,6 @@ Resources:
             Fn::Base64: !Sub |
               #!/bin/bash
               echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-          NetworkInterfaces:
-            AssociatePublicIpAddress: ture
-            DeviceIndex: 0
-            SubnetId: !Ref ContainerInstanceSubnet1a
-            Groups:
-              - !GetAtt ContainerInstanceSecurityGroup.GroupId
-            DeleteOnTermination: true
 
   FleetIAMRole:
     Type: AWS::IAM::Role
