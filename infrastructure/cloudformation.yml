@@ -173,21 +173,17 @@ Resources:
         SpotPrice: !Ref SpotPrice
         TargetCapacity: !Ref TargetCapacity
         LaunchSpecifications:
-        # NOTE:
-        # If you want to use other type of ec2 instances,
-        # fix these parameters
         - EbsOptimized: 'false'
-          InstanceType: 'm4.large'
-          ImageId: 'ami-3a000e5d'
+          InstanceType: !Ref MainContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
           WeightedCapacity: '4'
           UserData:
             Fn::Base64: !Sub |
               #!/bin/bash
               echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-
         - EbsOptimizes: 'false'
-          InstanceType: 'm3.large'
-          ImageId: 'ami-3a000e5d'
+          InstanceType: !Ref SubContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
           SubnetId:
             Ref: ContainerInstanceSubnet1c
           WeightedCapacity: '1'
@@ -421,6 +417,15 @@ Parameters:
   TargetCapacity:
     Default: 2
     Type: Number
+  MainContainerInstanceType:
+    Default: 'm4.large'
+    Type: String
+  SubContainerInstanceType:
+    Default: 'm3.large'
+    Type: String
+  ContainerInstanceImageId:
+    Default: 'ami-3a000e5d'
+    Type: 'String'
 
 Conditions:
   SSHKeySpecified:
