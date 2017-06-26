@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
 Description: revieee development settings
 Resources:
 
@@ -163,6 +164,53 @@ Resources:
     Properties:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
+#------ SpotFleet ---------#
+  EcsSpotFleetRequest:
+    Type: AWS::EC2::SpotFleet
+    Properties:
+      SpotFleetRequestConfigData:
+        IamFleetRole: !GetAtt FleetIAMRole.Arn
+        SpotPrice: !Ref SpotPrice
+        TargetCapacity: !Ref TargetCapacity
+        LaunchSpecifications:
+        - EbsOptimized: 'false'
+          InstanceType: !Ref MainContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
+          WeightedCapacity: '4'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+        - EbsOptimizes: 'false'
+          InstanceType: !Ref SubContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
+          SubnetId:
+            Ref: ContainerInstanceSubnet1c
+          WeightedCapacity: '1'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+
+  FleetIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - spotfleet.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
+
+#------- SpotFleet/ --------#
+
   EndpointInstanceIamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -199,6 +247,159 @@ Resources:
           Value: RevieeeEndpointInstance
       # UserData: [TODO] run itamae
 
+  # ------ API Gateway ------
+
+  ApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "states:*"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", AWSStepFunctionsFullAccess ] ]
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApiRole ] ]
+
+  RevieeeApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApi ] ]
+  RevieeeApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      ParentId: !GetAtt RevieeeApi.RootResourceId
+      PathPart: "stage"
+  RevieeeApiCreateMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      ResourceId: !Ref RevieeeApiResource
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        RequestTemplates:
+          application/json: !Sub
+            - |-
+              {
+                "input": "{}",
+                "name": "Hello",
+                "stateMachineArn": "${stateMachineArn}"
+              }
+            - { stateMachineArn: !Ref StateMachineCreate }
+        Type: AWS
+        Uri: !Join [ "", [ "arn:aws:apigateway:", !Ref "AWS::Region", ":states:action/StartExecution" ] ]
+        Credentials: !GetAtt ApiRole.Arn
+      MethodResponses:
+        - StatusCode: 200
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: RevieeeApiCreateMethod
+    Properties:
+      RestApiId: !Ref RevieeeApi
+      StageName: pub
+
+  # ------ /API Gateway ------
+
+  # ------ StepFunctions ------
+
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - states.ap-northeast-1.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "lambda:InvokeFunction"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", StatesExecutionPolicy ] ]
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeStateMachineRole ] ]
+
+  StateMachineCreate:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: !Sub
+        - |-
+          {
+            "Comment": "Run ECS Task",
+            "StartAt": "RunEcsTask",
+            "States": {
+              "RunEcsTask": {
+                "Type": "Task",
+                "Resource": "${taskArn}",
+                "End": true
+              }
+            }
+          }
+        - { "taskArn": !Ref RunEcsTaskFunction }
+      RoleArn: !GetAtt StateMachineRole.Arn
+
+  # ------ /StepFunctions ------
+
+  # ------ Lambda ------
+
+  RunEcsTaskFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: "ecs:RunTask"
+                Resource: "*"
+          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", RunEcsTaskFunctionPolicy ] ]
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeRunEcsTaskFunctionRole ] ]
+
+  RunEcsTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs6.10
+      CodeUri: ./functions/RunEcsTask/built/
+      Role: !GetAtt RunEcsTaskFunctionRole.Arn
+
+  # ------ /Lambda ------
+
 # Parameter
 Parameters:
   SSHPort:
@@ -209,6 +410,22 @@ Parameters:
     Type: String
   AcceptCidrIp:
     Type: String
+# Parameters for SpotFleetRequest
+  SpotPrice:
+    Default: 0.139
+    Type: Number
+  TargetCapacity:
+    Default: 2
+    Type: Number
+  MainContainerInstanceType:
+    Default: 'm4.large'
+    Type: String
+  SubContainerInstanceType:
+    Default: 'm3.large'
+    Type: String
+  ContainerInstanceImageId:
+    Default: 'ami-3a000e5d'
+    Type: 'String'
 
 Conditions:
   SSHKeySpecified:
