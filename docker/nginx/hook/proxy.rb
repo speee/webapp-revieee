@@ -60,8 +60,9 @@ proxymap = ProxyMap.new('sample')
 url = proxymap.fetch_url(endpoint_id)
 
 if url.nil?
-  proxy = MySQLProxy.new('db', 'root', '', 'revieee_app_development')
+  proxy = MySQLProxy.new('db', 'root', '', 'revieee_development')
   url = proxy.find_proxy_url(endpoint_id)
+  Nginx.echo(url)
   proxymap.set_url(endpoint_id, url)
   proxy.close
 end
