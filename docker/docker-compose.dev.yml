@@ -1,0 +1,18 @@
+version: '3'
+services:
+  db:
+    container_name: dev-revieee-db
+    image: dev-revieee/db
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=true"
+
+  revieee_nginx:
+    links:
+      - db
+    depends_on:
+      - db
