@@ -1,5 +1,13 @@
 version: '3'
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
   db:
     container_name: dev-revieee-db
     image: dev-revieee/db
@@ -16,4 +24,7 @@ services:
       - db
     links:
       - db
+      - nginx-proxy
+    environment:
+      - VIRTUAL_HOST=*.reviewapps.speee.jp
 

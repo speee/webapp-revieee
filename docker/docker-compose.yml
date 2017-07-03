@@ -9,5 +9,3 @@ services:
     volumes:
       - ./nginx/conf:/usr/local/nginx/conf
       - ./nginx/hook:/usr/local/nginx/hook
-    ports:
-      - 80:80
