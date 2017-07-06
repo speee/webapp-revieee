@@ -4,6 +4,7 @@ require 'infrataster/rspec'
 Infrataster::Server.define(
   :revieee_nginx,
   '127.0.0.1',
+  vagrant: false,
 )
 
 RSpec.configure do |config|
