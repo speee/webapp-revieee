@@ -62,7 +62,7 @@ url = proxymap.fetch_url(endpoint_id)
 if url.nil?
   proxy = MySQLProxy.new('db', 'root', '', 'revieee_development')
   url = proxy.find_proxy_url(endpoint_id)
-  Nginx.echo(url)
+  Nginx.echo("MySQL Access: endpoint_id => #{endpoint_id} url=>#{url}")
   proxymap.set_url(endpoint_id, url)
   proxy.close
 end
