@@ -67,5 +67,4 @@ if url.nil?
   proxy.close
 end
 
-Nginx.echo url
-request.set "proxy_pass", url
+url
