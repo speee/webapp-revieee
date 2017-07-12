@@ -56,7 +56,7 @@ end
 request = Nginx::Request.new
 endpoint_id = request.var.endpoint_id
 
-proxymap = ProxyMap.new('sample')
+proxymap = ProxyMap.new('revieee_sample')
 url = proxymap.fetch_url(endpoint_id)
 
 if url.nil?
@@ -67,4 +67,6 @@ if url.nil?
   proxy.close
 end
 
+Nginx.echo(url)
 url
+

@@ -23,5 +23,5 @@ class ProxyMap
 end
 
 request = Nginx::Request.new
-proxymap = ProxyMap.new('sample')
+proxymap = ProxyMap.new('revieee_sample')
 proxymap.delete(request.var.endpoint_id)
