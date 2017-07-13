@@ -68,4 +68,4 @@ if url.nil?
 end
 
 Nginx.echo url
-request.set "proxy_pass", url
+request.var.set "proxy_pass", url
