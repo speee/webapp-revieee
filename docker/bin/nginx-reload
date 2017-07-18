@@ -1,0 +1,4 @@
+#!/bin/bash
+cd "$(dirname "$(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0)")"
+
+docker exec revieee_nginx_container /usr/local/nginx/sbin/nginx -s reload
