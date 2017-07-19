@@ -1,0 +1,30 @@
+version: '3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  db:
+    container_name: dev-revieee-db
+    image: dev-revieee/db
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    ports:
+      - 33306:3306
+    environment:
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=true"
+
+  revieee_nginx:
+    depends_on:
+      - db
+    links:
+      - db
+      - nginx-proxy
+    environment:
+      - VIRTUAL_HOST=*.reviewapps.speee.jp
+

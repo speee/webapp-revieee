@@ -1,0 +1,14 @@
+#!/bin/sh
+
+CMDDIR="$(dirname "$(perl -e 'use Cwd "abs_path";print abs_path(shift)' "$0")")"
+
+case "${1:-}" in
+  nginx-reload)  shift 1; exec "$CMDDIR/nginx-reload"  "$@";;
+
+  *)
+    echo 'Usage: revieee <subcommand> [<args>]'
+    echo
+    echo 'Subcommands of revieee are:'
+    echo '  nginx-reload:  nginxの設定を反映させます'
+  ;;
+esac
