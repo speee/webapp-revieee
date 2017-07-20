@@ -3,6 +3,7 @@ import { createConnection, Connection } from "typeorm";
 import "reflect-metadata";
 import { ApiGatewayEvent } from "./ApiGatewayEvent";
 import { RevieeeTarget } from "./entity/RevieeeTarget";
+import { Task } from "./entity/Task";
 import { TaskDefinition } from "./entity/TaskDefinition";
 
 async function buildConnection(): Promise<Connection> {
@@ -22,8 +23,9 @@ async function buildConnection(): Promise<Connection> {
 }
 
 async function buildRevieeeTarget(connection: Connection, event: ApiGatewayEvent): Promise<RevieeeTarget> {
+    const taskRepository = connection.getRepository(Task)
     const taskDefinitionRepository = connection.getRepository(TaskDefinition);
-    const revieeeTarget = new RevieeeTarget(taskDefinitionRepository);
+    const revieeeTarget = new RevieeeTarget(taskRepository, taskDefinitionRepository);
     revieeeTarget.repository = event.headRepository
     revieeeTarget.branch = event.headBranch;
     revieeeTarget.prNumber = event.prNumber;
@@ -34,5 +36,10 @@ export function handler(event: ApiGatewayEvent, context: Context, callback: Call
     (async () => {
         const connection = await buildConnection();
         const revieeeTarget = await buildRevieeeTarget(connection, event);
-    })();
+        return await revieeeTarget.create();
+    })().then((task: Task) => {
+        callback(null, task);
+    }).catch((err: any) => {
+        callback(err);
+    });
 }
