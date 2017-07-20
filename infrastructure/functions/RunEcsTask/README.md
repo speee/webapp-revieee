@@ -1,0 +1,13 @@
+## build
+```
+$ npm run build
+```
+
+## required envrironments
+- TYPEORM_HOST
+- TYPEORM_PORT
+- TYPEORM_USERNAME
+- TYPEORM_PASSWORD
+- TYPEORM_DATABASE
+- GITHUB_ACCESS_TOKEN
+- CLUSTER_NAME
