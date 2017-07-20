@@ -6,4 +6,3 @@ export declare interface ApiGatewayEvent {
     baseRepository: string;
     baseBranch: string;
 }
- 
