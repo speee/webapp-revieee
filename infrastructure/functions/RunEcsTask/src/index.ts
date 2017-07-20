@@ -2,6 +2,7 @@ import { Callback, Context } from "aws-lambda";
 import { createConnection, Connection } from "typeorm";
 import "reflect-metadata";
 import { ApiGatewayEvent } from "./ApiGatewayEvent";
+import { RevieeeTarget } from "./entity/RevieeeTarget";
 
 async function buildConnection(): Promise<Connection> {
     return createConnection({
@@ -19,9 +20,17 @@ async function buildConnection(): Promise<Connection> {
     });
 }
 
+async function buildRevieeeTarget(event: ApiGatewayEvent): Promise<RevieeeTarget> {
+    const revieeeTarget = new RevieeeTarget();
+    revieeeTarget.repository = event.headRepository
+    revieeeTarget.branch = event.headBranch;
+    revieeeTarget.prNumber = event.prNumber;
+    return revieeeTarget;
+}
 
 export function handler(event: ApiGatewayEvent, context: Context, callback: Callback) {
     (async () => {
         const connection = await buildConnection();
+        const revieeeTarget = await buildRevieeeTarget(event);
     })();
 }
