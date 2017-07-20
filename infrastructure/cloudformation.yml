@@ -164,6 +164,53 @@ Resources:
     Properties:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
+#------ SpotFleet ---------#
+  EcsSpotFleetRequest:
+    Type: AWS::EC2::SpotFleet
+    Properties:
+      SpotFleetRequestConfigData:
+        IamFleetRole: !GetAtt FleetIAMRole.Arn
+        SpotPrice: !Ref SpotPrice
+        TargetCapacity: !Ref TargetCapacity
+        LaunchSpecifications:
+        - EbsOptimized: 'false'
+          InstanceType: !Ref MainContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
+          WeightedCapacity: '4'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+        - EbsOptimizes: 'false'
+          InstanceType: !Ref SubContainerInstanceType
+          ImageId: !Ref ContainerInstanceImageId
+          SubnetId:
+            Ref: ContainerInstanceSubnet1c
+          WeightedCapacity: '1'
+          UserData:
+            Fn::Base64: !Sub |
+              #!/bin/bash
+              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+
+  FleetIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - spotfleet.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
+
+#------- SpotFleet/ --------#
+
   EndpointInstanceIamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -417,6 +464,22 @@ Parameters:
     Type: String
   AcceptCidrIp:
     Type: String
+# Parameters for SpotFleetRequest
+  SpotPrice:
+    Default: 0.139
+    Type: Number
+  TargetCapacity:
+    Default: 2
+    Type: Number
+  MainContainerInstanceType:
+    Default: 'm4.large'
+    Type: String
+  SubContainerInstanceType:
+    Default: 'm3.large'
+    Type: String
+  ContainerInstanceImageId:
+    Default: 'ami-3a000e5d'
+    Type: 'String'
 
 Conditions:
   SSHKeySpecified:
