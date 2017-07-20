@@ -15,9 +15,15 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "0.0.12",
+    "@types/mysql": "0.0.33",
     "@types/node": "^7.0.31",
     "aws-sdk": "^2.71.0",
     "tslint": "^5.4.3",
     "typescript": "^2.3.4"
+  },
+  "dependencies": {
+    "mysql": "^2.13.0",
+    "reflect-metadata": "^0.1.10",
+    "typeorm": "0.0.11"
   }
 }
