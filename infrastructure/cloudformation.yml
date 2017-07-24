@@ -400,6 +400,23 @@ Resources:
 
   # ------ /Lambda ------
 
+  # ----- RDS -----
+  RevieeeDB:
+    Type: AWS::RDS::DB::Instance
+    Properites:
+      DBSecurityGroups:
+        - Ref: #TODO: SET Security Group
+        - Ref: #TODO: SET Security Group
+      AllocatedStorage: '' #TODO: SET Correct Settings
+      DBInstanceClass: db.m1.small #TODO: set correct instance type
+      Engine: MySQL
+      MasterUsername: #TODO: secure settings
+      MasterUserPassword: #TODO: secure settings
+    DeletionPolicy: Snapshot
+
+  # ----- /RDS ----
+
+
 # Parameter
 Parameters:
   SSHPort:
