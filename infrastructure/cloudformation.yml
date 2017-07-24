@@ -451,6 +451,15 @@ Resources:
       Runtime: nodejs6.10
       CodeUri: ./functions/RunEcsTask/built/
       Role: !GetAtt RunEcsTaskFunctionRole.Arn
+      Environment:
+        # TODO: refer RDS
+        # TYPEORM_HOST:
+        # TYPEORM_PORT:
+        # TYPEORM_USERNAME:
+        # TYPEORM_PASSWORD:
+        # TYPEORM_DATABASE:
+        GITHUB_ACCESS_TOKEN: !Ref GitHubAccessToken
+        CLUSTER_NAME: !Ref EcsCluster
 
   # ------ /Lambda ------
 
@@ -480,6 +489,8 @@ Parameters:
   ContainerInstanceImageId:
     Default: 'ami-3a000e5d'
     Type: 'String'
+  GitHubAccessToken:
+    Type: String
 
 Conditions:
   SSHKeySpecified:
