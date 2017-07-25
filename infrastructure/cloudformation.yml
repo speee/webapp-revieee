@@ -409,8 +409,8 @@ Resources:
       AllocatedStorage: '1'
       DBInstanceClass: db.t2.micro
       Engine: MySQL
-      MasterUsername: #TODO: secure settings
-      MasterUserPassword: #TODO: secure settings
+      MasterUsername: !Ref DBUserName
+      MasterUserPassword: !Ref DBPassword
     DeletionPolicy: Snapshot
 
   # ----- /RDS ----
@@ -442,6 +442,12 @@ Parameters:
   ContainerInstanceImageId:
     Default: 'ami-3a000e5d'
     Type: 'String'
+  DBUserName:
+    Default: ''
+    Type: String
+  DBPassword:
+    Default: ''
+    Type: String
 
 Conditions:
   SSHKeySpecified:
