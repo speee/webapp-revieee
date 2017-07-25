@@ -406,7 +406,7 @@ Resources:
     Properites:
       DBSecurityGroups:
         - Ref: RevieeeAppServerSecurityGroup
-      AllocatedStorage: '' #TODO: SET Correct Settings
+      AllocatedStorage: '1'
       DBInstanceClass: db.t2.micro
       Engine: MySQL
       MasterUsername: #TODO: secure settings
