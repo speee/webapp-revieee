@@ -405,8 +405,7 @@ Resources:
     Type: AWS::RDS::DB::Instance
     Properites:
       DBSecurityGroups:
-        - Ref: #TODO: SET Security Group
-        - Ref: #TODO: SET Security Group
+        - Ref: RevieeeAppServerSecurityGroup
       AllocatedStorage: '' #TODO: SET Correct Settings
       DBInstanceClass: db.t2.micro
       Engine: MySQL
