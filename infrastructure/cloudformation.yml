@@ -443,10 +443,8 @@ Parameters:
     Default: 'ami-3a000e5d'
     Type: 'String'
   DBUserName:
-    Default: ''
     Type: String
   DBPassword:
-    Default: ''
     Type: String
 
 Conditions:
