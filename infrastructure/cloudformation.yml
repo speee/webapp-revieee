@@ -411,7 +411,6 @@ Resources:
       Engine: MySQL
       MasterUsername: !Ref DBUserName
       MasterUserPassword: !Ref DBPassword
-    DeletionPolicy: Snapshot
 
   # ----- /RDS ----
 
