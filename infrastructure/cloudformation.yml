@@ -450,10 +450,6 @@ Parameters:
 Conditions:
   SSHKeySpecified:
     !Not [ !Equals [ !Ref SSHKey, "" ] ]
-  DBUserNameSpecified:
-    !Not [ !Equals [ !Ref DBUserName, ""]]
-  DBPasswordSpecified:
-    !Not [ !Equals [ !Ref DBPassword, ""]]
 
 Outputs:
   EcsClusterName:
