@@ -1,26 +1,10 @@
 import { Callback, Context } from "aws-lambda";
-import { createConnection, Connection } from "typeorm";
-import "reflect-metadata";
+import { Connection } from "typeorm";
+import { Database } from "./Database";
 import { WebhookEvent } from "./WebhookEvent";
 import { RevieeeTarget } from "./entity/RevieeeTarget";
 import { Task } from "./entity/Task";
 import { TaskDefinition } from "./entity/TaskDefinition";
-
-async function buildConnection(): Promise<Connection> {
-    return createConnection({
-        "driver": {
-            "type": "mysql",
-            "host": process.env.TYPEORM_HOST,
-            "port": process.env.TYPEORM_PORT,
-            "username": process.env.TYPEORM_USERNAME,
-            "password": process.env.TYPEORM_PASSWORD,
-            "database": process.env.TYPEORM_DATABASE,
-        },
-        "entities": [
-            __dirname + "/entity/*.js"
-        ]
-    });
-}
 
 async function buildRevieeeTarget(connection: Connection, event: WebhookEvent): Promise<RevieeeTarget> {
     const taskRepository = connection.getRepository(Task)
@@ -34,7 +18,7 @@ async function buildRevieeeTarget(connection: Connection, event: WebhookEvent): 
 
 export function handler(event: WebhookEvent, context: Context, callback: Callback) {
     (async () => {
-        const connection = await buildConnection();
+        const connection = await Database.createConnection();
         const revieeeTarget = await buildRevieeeTarget(connection, event);
         return await revieeeTarget.create();
     })().then((task: Task) => {
