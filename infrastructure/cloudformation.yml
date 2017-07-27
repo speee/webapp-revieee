@@ -451,7 +451,7 @@ Resources:
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
-      CodeUri: ./functions/RunEcsTask/built/
+      CodeUri: ./functions/built/
       Role: !GetAtt RunEcsTaskFunctionRole.Arn
       Tracing: Active
       Environment:

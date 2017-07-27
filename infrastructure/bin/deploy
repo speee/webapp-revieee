@@ -15,7 +15,7 @@ TEMPLATE_FILE=cloudformation.yml
 # Move project root
 cd "$(dirname "$(perl -e 'use Cwd "abs_path";print abs_path(shift)' "$0")")/.." || exit 1
 
-sh -c 'cd ./functions/RunEcsTask && npm install && npm run build && cp -rf ./node_modules ./built/'
+sh -c 'cd ./functions && npm install && npm run build && cp -rf ./node_modules ./built/'
 
 mkdir -p ./built
 

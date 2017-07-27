@@ -1,7 +1,7 @@
 {
-  "name": "run-ecs-task",
+  "name": "webapp-revieee",
   "version": "0.0.1",
-  "description": "Lambda function that to run ECS Task",
+  "description": "Lambda functions for webapp-revieee",
   "main": "index.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
