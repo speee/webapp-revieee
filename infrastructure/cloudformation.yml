@@ -449,7 +449,7 @@ Resources:
   RunEcsTaskFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      Handler: RunEcsTask.handler
       Runtime: nodejs6.10
       CodeUri: ./functions/built/
       Role: !GetAtt RunEcsTaskFunctionRole.Arn
