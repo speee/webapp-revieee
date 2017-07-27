@@ -402,6 +402,23 @@ Resources:
 
   # ----- RDS -----
 
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Revieee DB Parameter Group
+      Family: mysql5.6
+      Parameters:
+        character_set_client: utf8mb4
+        character_set_connection: utf8mb4
+        character_set_database: utf8mb4
+        character_set_filesystem: binary
+        character_set_results: utf8mb4
+        character_set_server: utf8mb4
+        skip-character-set-client-handshake: 1
+        time_zone: Asia/Tokyo
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName", db-parameter-group ] ]
 
   RevieeeDB:
     Type: AWS::RDS::DB::Instance
@@ -410,6 +427,7 @@ Resources:
         - Ref: RevieeeAppServerSecurityGroup
       AllocatedStorage: 1
       DBInstanceClass: db.t2.micro
+      DBParameterGroupName:  !Ref DBParameterGroup
       Engine: MySQL
       EngineVersion: 5.6.35
       MasterUsername: !Ref DBUserName
