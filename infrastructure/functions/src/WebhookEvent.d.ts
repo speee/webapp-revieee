@@ -1,4 +1,4 @@
-export declare interface ApiGatewayEvent {
+export declare interface WebhookEvent {
     action: string;
     prNumber: number;
     headRepository: string;

@@ -1,7 +1,7 @@
 import { Callback, Context } from "aws-lambda";
 import { createConnection, Connection } from "typeorm";
 import "reflect-metadata";
-import { ApiGatewayEvent } from "./ApiGatewayEvent";
+import { WebhookEvent } from "./WebhookEvent";
 import { RevieeeTarget } from "./entity/RevieeeTarget";
 import { Task } from "./entity/Task";
 import { TaskDefinition } from "./entity/TaskDefinition";
@@ -22,7 +22,7 @@ async function buildConnection(): Promise<Connection> {
     });
 }
 
-async function buildRevieeeTarget(connection: Connection, event: ApiGatewayEvent): Promise<RevieeeTarget> {
+async function buildRevieeeTarget(connection: Connection, event: WebhookEvent): Promise<RevieeeTarget> {
     const taskRepository = connection.getRepository(Task)
     const taskDefinitionRepository = connection.getRepository(TaskDefinition);
     const revieeeTarget = new RevieeeTarget(taskRepository, taskDefinitionRepository);
@@ -32,7 +32,7 @@ async function buildRevieeeTarget(connection: Connection, event: ApiGatewayEvent
     return revieeeTarget;
 }
 
-export function handler(event: ApiGatewayEvent, context: Context, callback: Callback) {
+export function handler(event: WebhookEvent, context: Context, callback: Callback) {
     (async () => {
         const connection = await buildConnection();
         const revieeeTarget = await buildRevieeeTarget(connection, event);
