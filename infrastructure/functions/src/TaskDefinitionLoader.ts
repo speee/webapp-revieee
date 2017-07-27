@@ -4,7 +4,7 @@ import * as YAML from "js-yaml";
 import { RevieeeTarget } from "./entity/RevieeeTarget";
 
 export class TaskDefinitionLoader {
-    readonly configFile = "task_definition.yml"
+    readonly configFile = "task_definition.yml";
     revieeeTarget: RevieeeTarget;
 
     constructor(revieeeTarget: RevieeeTarget) {
@@ -12,8 +12,8 @@ export class TaskDefinitionLoader {
     }
 
     async load(): Promise<ECS.RegisterTaskDefinitionRequest> {
-        const gh = new GitHub({ token: process.env.GITHUB_ACCESS_TOKEN })
-        const repository = gh.getRepo(this.revieeeTarget.repository)
+        const gh = new GitHub({ token: process.env.GITHUB_ACCESS_TOKEN });
+        const repository = gh.getRepo(this.revieeeTarget.repository);
         return repository.getContents(
             this.revieeeTarget.branch,
             this.configFile,

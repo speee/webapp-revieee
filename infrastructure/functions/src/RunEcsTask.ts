@@ -7,10 +7,10 @@ import { Task } from "./entity/Task";
 import { TaskDefinition } from "./entity/TaskDefinition";
 
 async function buildRevieeeTarget(connection: Connection, event: WebhookEvent): Promise<RevieeeTarget> {
-    const taskRepository = connection.getRepository(Task)
+    const taskRepository = connection.getRepository(Task);
     const taskDefinitionRepository = connection.getRepository(TaskDefinition);
     const revieeeTarget = new RevieeeTarget(taskRepository, taskDefinitionRepository);
-    revieeeTarget.repository = event.headRepository
+    revieeeTarget.repository = event.headRepository;
     revieeeTarget.branch = event.headBranch;
     revieeeTarget.prNumber = event.prNumber;
     return revieeeTarget;
