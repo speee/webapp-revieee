@@ -401,8 +401,16 @@ Resources:
   # ------ /Lambda ------
 
   # ----- RDS -----
-  DBSubnetGroup: #TODO
+  DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Revieee DB Subnet Group
+      SubnetIds:
+        - !Ref RevieeeAppSubnet1a
+        - !Ref RevieeeAppSubnet1c
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName", db-subnet-group ] ]
 
   SecurityGroupDB: #TODO
     Type: AWS::EC2::SecurityGroup
