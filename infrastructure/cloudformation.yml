@@ -401,6 +401,11 @@ Resources:
   # ------ /Lambda ------
 
   # ----- RDS -----
+  DBSubnetGroup: #TODO
+    Type: AWS::RDS::DBSubnetGroup
+
+  SecurityGroupDB: #TODO
+    Type: AWS::EC2::SecurityGroup
 
   DBParameterGroup:
     Type: AWS::RDS::DBParameterGroup
@@ -423,16 +428,17 @@ Resources:
   RevieeeDB:
     Type: AWS::RDS::DB::Instance
     Properites:
-      DBSecurityGroups:
-        - Ref: RevieeeAppServerSecurityGroup
       AllocatedStorage: 1
       DBInstanceClass: db.t2.micro
       DBParameterGroupName:  !Ref DBParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: MySQL
       EngineVersion: 5.6.35
       MasterUsername: !Ref DBUserName
       MasterUserPassword: !Ref DBPassword
       StorageType: gp2
+      VPCSecurityGroups:
+        - Ref: SecurityGroupDB
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref "AWS::StackName", db-instance ] ]
