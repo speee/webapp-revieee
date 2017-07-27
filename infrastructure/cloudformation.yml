@@ -415,6 +415,9 @@ Resources:
       MasterUsername: !Ref DBUserName
       MasterUserPassword: !Ref DBPassword
       StorageType: gp2
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName", db-instance ] ]
 
   # ----- /RDS ----
 
