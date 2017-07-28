@@ -412,8 +412,19 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref "AWS::StackName", db-subnet-group ] ]
 
-  SecurityGroupDB: #TODO
+  SecurityGroupDB:
     Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SecutiryGroup for DB
+      VpcId: !Ref RevieeeVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref RevieeeAppServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref "AWS::StackName", security-group-db ] ]
 
   DBParameterGroup:
     Type: AWS::RDS::DBParameterGroup
