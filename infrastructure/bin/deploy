@@ -27,4 +27,5 @@ aws cloudformation package \
 aws cloudformation deploy \
     --capabilities CAPABILITY_NAMED_IAM \
     --template-file built/cloudformation.yml \
-    --stack-name "$STACK_NAME"
+    --stack-name "$STACK_NAME" \
+    --parameter-overrides DBUserName="$DBUserName" DBPassword="$DBPassword" AcceptCidrIp="$AcceptCidrIp"
