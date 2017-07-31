@@ -176,6 +176,8 @@ Resources:
         - EbsOptimized: 'false'
           InstanceType: !Ref MainContainerInstanceType
           ImageId: !Ref ContainerInstanceImageId
+          SubnetId:
+            Ref: ContainerInstanceSubnet1a
           WeightedCapacity: '4'
           UserData:
             Fn::Base64: !Sub |
