@@ -165,6 +165,23 @@ Resources:
       ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
 
 #------ SpotFleet ---------#
+  FleetIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - spotfleet.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
+      RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
+
   EcsSpotFleetRequest:
     Type: AWS::EC2::SpotFleet
     Properties:
@@ -193,23 +210,6 @@ Resources:
             Fn::Base64: !Sub |
               #!/bin/bash
               echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-
-  FleetIAMRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-                - spotfleet.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
 
 #------- SpotFleet/ --------#
 
