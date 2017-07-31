@@ -446,7 +446,7 @@ Resources:
 
   RevieeeDB:
     Type: AWS::RDS::DB::Instance
-    Properites:
+    Properties:
       AllocatedStorage: 1
       DBInstanceClass: db.t2.micro
       DBParameterGroupName:  !Ref DBParameterGroup
