@@ -162,7 +162,7 @@ Resources:
   EcsCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
+      ClusterName: 'RevieeeCluster'
 
 #------ SpotFleet ---------#
   FleetIAMRole:
@@ -199,7 +199,7 @@ Resources:
           UserData:
             Fn::Base64: !Sub |
               #!/bin/bash
-              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+              echo ECS_CLUSTER=RevieeeCluster >> /etc/ecs/ecs.config
         - EbsOptimizes: 'false'
           InstanceType: !Ref SubContainerInstanceType
           ImageId: !Ref ContainerInstanceImageId
@@ -209,7 +209,7 @@ Resources:
           UserData:
             Fn::Base64: !Sub |
               #!/bin/bash
-              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+              echo ECS_CLUSTER=RevieeeCluster >> /etc/ecs/ecs.config
 
 #------- SpotFleet/ --------#
 
