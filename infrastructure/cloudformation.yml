@@ -1,170 +1,93 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
-Description: revieee development settings
+AWSTemplateFormatVersion: 2010-09-09
+Description: build template of Revieee
 Resources:
-
-# VPC
-## VPC Base
   RevieeeVPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.1.0.0/16
-      EnableDnsSupport: "true"
-      EnableDnsHostnames: "true"
+      CidrBlock: 10.100.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
       InstanceTenancy: default
-      Tags:
-       - Key: Name
-         Value: RevieeeDevelopmentVPC
-## Revieee Internet Gateway
+  RevieeeAppSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      CidrBlock: 10.100.0.0/26
+      MapPublicIpOnLaunch: true
+  ContainerInstanceSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref RevieeeVPC
+      CidrBlock: 10.100.10.0/24
+      MapPublicIpOnLaunch: true
+
   RevieeeIGW:
     Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: Name
-          Value: RevieeeIGW
-## Attach Internet Gateway To VPC
   AttachIGWtoVPC:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       InternetGatewayId: !Ref RevieeeIGW
       VpcId: !Ref RevieeeVPC
-
-# Subnet
-## Webhook Server
-### Subnet 1a
-  RevieeeAppSubnet1a:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref RevieeeVPC
-      AvailabilityZone: ap-northeast-1a
-      CidrBlock: 10.1.192.0/26
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: RevieeeAppSubnet1a
-### Subnet 1c
-  RevieeeAppSubnet1c:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref RevieeeVPC
-      AvailabilityZone: ap-northeast-1c
-      CidrBlock: 10.1.192.64/26
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: RevieeeAppSubnet1c
-## ECS Container Instance
-### Subnet1a
-  ContainerInstanceSubnet1a:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref RevieeeVPC
-      AvailabilityZone: ap-northeast-1a
-      CidrBlock: 10.1.194.0/26
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: ContainerInstanceSubnet1a
-### Subnet1c
-  ContainerInstanceSubnet1c:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref RevieeeVPC
-      AvailabilityZone: ap-northeast-1c
-      CidrBlock: 10.1.194.64/26
-      MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: ContainerInstanceSubnet1c
-# Route Table
-## Public Route Table
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref RevieeeVPC
-      Tags:
-        - Key: Name
-          Value: PublicRouteTable
   RouteAddInternet:
     Type: AWS::EC2::Route
     Properties:
-      DestinationCidrBlock: "0.0.0.0/0"
+      DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref RevieeeIGW
       RouteTableId: !Ref PublicRouteTable
-### App Server Route Table Association
-  AssociateAppSubnet1aToPublicRouteTable:
+  AssociateAppSubnetToPublicRouteTable:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref RevieeeAppSubnet1a
-  AssociateAppSubnet1cToPublicRouteTable:
+      SubnetId: !Ref RevieeeAppSubnet
+  AssociateContainerInstanceSubnetToPublicRouteTable:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref RevieeeAppSubnet1c
-### Container Instance Route Table Association
-  AssociateContainerInstanceSubnet1aToPublicRouteTable:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref ContainerInstanceSubnet1a
-  AssociateContainerInstanceSubnet1cToPublicRouteTable:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref ContainerInstanceSubnet1c
+      SubnetId: !Ref ContainerInstanceSubnet
 
-# SecurityGroup
-## AppServer Security Group
   RevieeeAppServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref RevieeeVPC
+      GroupName: !Sub "${AWS::StackName}-RevieeeAppServerSecurityGroup"
       GroupDescription: "Security Group for Revieee App Server"
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: !Ref AcceptCidrIp
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: !Ref AcceptCidrIp
-      - IpProtocol: tcp
-        FromPort: !Ref SSHPort
-        ToPort: !Ref SSHPort
-        CidrIp: !Ref AcceptCidrIp
-      GroupName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeAppServerSecurityGroup ] ]
-      Tags:
-        - Key: Name
-          Value: RevieeeAppServerSecurityGroup
-
-## ECS Container Instance
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: !Ref SSHPort
+          ToPort: !Ref SSHPort
+          CidrIp: !Ref AcceptCidrIp
   ContainerInstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: !Ref RevieeeVPC
+      GroupName: !Sub "${AWS::StackName}-RevieeeContainerInstanceSecurityGroup"
       GroupDescription: "Security Group for Revieee Container Instance"
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 32768
-        ToPort: 61000
-        SourceSecurityGroupId: !Ref RevieeeAppServerSecurityGroup
-      - IpProtocol: tcp
-        FromPort: !Ref SSHPort
-        ToPort: !Ref SSHPort
-        CidrIp: !Ref AcceptCidrIp
-      GroupName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeContainerInstanceSecurityGroup ] ]
-      Tags:
-        - Key: Name
-          Value: RevieeeContainerInstanceSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 32768
+          ToPort: 61000
+          SourceSecurityGroupId: !Ref RevieeeAppServerSecurityGroup
+        - IpProtocol: tcp
+          FromPort: !Ref SSHPort
+          ToPort: !Ref SSHPort
+          CidrIp: !Ref AcceptCidrIp
 
   EcsCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeCluster ] ]
-
-#------ SpotFleet ---------#
+      ClusterName: !Sub "${AWS::StackName}-RevieeeCluster"
   EcsSpotFleetRequest:
     Type: AWS::EC2::SpotFleet
     Properties:
@@ -173,234 +96,85 @@ Resources:
         SpotPrice: !Ref SpotPrice
         TargetCapacity: !Ref TargetCapacity
         LaunchSpecifications:
-        - EbsOptimized: 'false'
-          InstanceType: !Ref MainContainerInstanceType
-          ImageId: !Ref ContainerInstanceImageId
-          WeightedCapacity: '4'
-          UserData:
-            Fn::Base64: !Sub |
-              #!/bin/bash
-              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-        - EbsOptimizes: 'false'
-          InstanceType: !Ref SubContainerInstanceType
-          ImageId: !Ref ContainerInstanceImageId
-          SubnetId:
-            Ref: ContainerInstanceSubnet1c
-          WeightedCapacity: '1'
-          UserData:
-            Fn::Base64: !Sub |
-              #!/bin/bash
-              echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
-
+          - InstanceType: !Ref ContainerInstanceType
+            ImageId: !Ref ContainerInstanceImageId
+            IamInstanceProfile:
+              Arn: !GetAtt EcsClusterInstanceIAMInstanceProfile.Arn
+            SubnetId: !Ref ContainerInstanceSubnet
+            SecurityGroups:
+              - GroupId: !Ref ContainerInstanceSecurityGroup
+            UserData:
+              Fn::Base64: !Sub |
+                #!/bin/bash
+                echo ECS_CLUSTER=${EcsCluster} >> /etc/ecs/ecs.config
   FleetIAMRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-          -
-            Effect: Allow
+          - Effect: Allow
             Principal:
               Service:
                 - spotfleet.amazonaws.com
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole'
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", FleetIAMRole ] ]
-
-#------- SpotFleet/ --------#
-
-  EndpointInstanceIamRole:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole"
+  EcsClusterInstanceIAMRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-          -
-            Effect: Allow
+          - Effect: Allow
             Principal:
               Service:
                 - ec2.amazonaws.com
             Action:
               - sts:AssumeRole
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeEndpointInstanceIamRole ] ]
-
-  EndpointInstanceProfile:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+  EcsClusterInstanceIAMInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - !Ref EndpointInstanceIamRole
+        - !Ref EcsClusterInstanceIAMRole
 
   EndpointInstance:
     Type: AWS::EC2::Instance
     Properties:
-      IamInstanceProfile: !Ref EndpointInstanceProfile
-      ImageId: ami-923d12f5
+      ImageId: !Ref EndpointInstanceImageId
       InstanceType: t2.micro
+      IamInstanceProfile: !Ref EndpointInstanceIAMInstanceProfile
       KeyName: !If [ SSHKeySpecified, !Ref SSHKey, !Ref "AWS::NoValue" ]
       SecurityGroupIds:
         - !GetAtt RevieeeAppServerSecurityGroup.GroupId
-      SubnetId: !Ref RevieeeAppSubnet1c
-      Tags:
-        - Key: Name
-          Value: RevieeeEndpointInstance
-      # UserData: [TODO] run itamae
-
-  # ------ API Gateway ------
-
-  ApiRole:
+      SubnetId: !Ref RevieeeAppSubnet
+  EndpointEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref EndpointInstance
+  EndpointInstanceIAMRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-          -
-            Effect: Allow
+          - Effect: Allow
             Principal:
               Service:
-                - apigateway.amazonaws.com
+                - ec2.amazonaws.com
             Action:
               - sts:AssumeRole
-      Policies:
-        - PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: "states:*"
-                Resource: "*"
-          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", AWSStepFunctionsFullAccess ] ]
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApiRole ] ]
-
-  RevieeeApi:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: !Join [ "-", [ !Ref "AWS::StackName", RevieeeApi ] ]
-  RevieeeApiResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref RevieeeApi
-      ParentId: !GetAtt RevieeeApi.RootResourceId
-      PathPart: "stage"
-  RevieeeApiCreateMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref RevieeeApi
-      ResourceId: !Ref RevieeeApiResource
-      AuthorizationType: NONE
-      HttpMethod: POST
-      Integration:
-        IntegrationHttpMethod: POST
-        IntegrationResponses:
-          - StatusCode: 200
-        PassthroughBehavior: WHEN_NO_TEMPLATES
-        RequestTemplates:
-          application/json: !Sub
-            - |-
-              {
-                "input": "{}",
-                "name": "Hello",
-                "stateMachineArn": "${stateMachineArn}"
-              }
-            - { stateMachineArn: !Ref StateMachineCreate }
-        Type: AWS
-        Uri: !Join [ "", [ "arn:aws:apigateway:", !Ref "AWS::Region", ":states:action/StartExecution" ] ]
-        Credentials: !GetAtt ApiRole.Arn
-      MethodResponses:
-        - StatusCode: 200
-  ApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    DependsOn: RevieeeApiCreateMethod
-    Properties:
-      RestApiId: !Ref RevieeeApi
-      StageName: pub
-
-  # ------ /API Gateway ------
-
-  # ------ StepFunctions ------
-
-  StateMachineRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-                - states.ap-northeast-1.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: "lambda:InvokeFunction"
-                Resource: "*"
-          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", StatesExecutionPolicy ] ]
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeStateMachineRole ] ]
-
-  StateMachineCreate:
-    Type: AWS::StepFunctions::StateMachine
-    Properties:
-      DefinitionString: !Sub
-        - |-
-          {
-            "Comment": "Run ECS Task",
-            "StartAt": "RunEcsTask",
-            "States": {
-              "RunEcsTask": {
-                "Type": "Task",
-                "Resource": "${taskArn}",
-                "End": true
-              }
-            }
-          }
-        - { "taskArn": !Ref RunEcsTaskFunction }
-      RoleArn: !GetAtt StateMachineRole.Arn
-
-  # ------ /StepFunctions ------
-
-  # ------ Lambda ------
-
-  RunEcsTaskFunctionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action: "ecs:RunTask"
-                Resource: "*"
-          PolicyName: !Join [ "-", [ !Ref "AWS::StackName", RunEcsTaskFunctionPolicy ] ]
       ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-      RoleName: !Join [ "-", [ !Ref "AWS::StackName", RevieeeRunEcsTaskFunctionRole ] ]
-
-  RunEcsTaskFunction:
-    Type: AWS::Serverless::Function
+        - "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+  EndpointInstanceIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
     Properties:
-      Handler: index.handler
-      Runtime: nodejs6.10
-      CodeUri: ./functions/RunEcsTask/built/
-      Role: !GetAtt RunEcsTaskFunctionRole.Arn
+      Roles:
+        - !Ref EndpointInstanceIAMRole
 
-  # ------ /Lambda ------
-
-# Parameter
 Parameters:
   SSHPort:
     Default: 22
@@ -410,22 +184,23 @@ Parameters:
     Type: String
   AcceptCidrIp:
     Type: String
-# Parameters for SpotFleetRequest
+    AllowedPattern: "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\/\\d{1,2}$"
+    Description: "The cidr block allow access to Revieee"
   SpotPrice:
-    Default: 0.139
+    Default: 0.124
     Type: Number
   TargetCapacity:
     Default: 2
     Type: Number
-  MainContainerInstanceType:
-    Default: 'm4.large'
-    Type: String
-  SubContainerInstanceType:
-    Default: 'm3.large'
+  ContainerInstanceType:
+    Default: m5.large
     Type: String
   ContainerInstanceImageId:
-    Default: 'ami-3a000e5d'
-    Type: 'String'
+    Default: ami-f3f8098c
+    Type: AWS::EC2::Image::Id
+  EndpointInstanceImageId:
+    Default: ami-ceafcba8
+    Type: AWS::EC2::Image::Id
 
 Conditions:
   SSHKeySpecified:
@@ -434,3 +209,5 @@ Conditions:
 Outputs:
   EcsClusterName:
     Value: !Ref EcsCluster
+  EndpointInstanceIp:
+    Value: !GetAtt EndpointInstance.PublicIp
