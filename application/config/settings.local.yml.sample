@@ -8,8 +8,6 @@ puma:
   worker_timeout: 5
 
 domain: xxxxxx
-task_definition_maps:
-  xxxxx: xxxxx
 
 database:
   password: xxxxx
