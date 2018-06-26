@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Build network of Revieee
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.100.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+  AlbSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.100.0.0/26
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+  AlbSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.100.0.64/26
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+  ContainerInstanceSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.100.10.0/24
+      MapPublicIpOnLaunch: true
+
+  IGW:
+    Type: AWS::EC2::InternetGateway
+  AttachIGWtoVPC:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref IGW
+      VpcId: !Ref VPC
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  RouteAddInternet:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref RouteTable
+  RouteTableAssociationAlbSubnet1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref AlbSubnet1
+  RouteTableAssociationAlbSubnet2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref AlbSubnet2
+  RouteTableAssociationContainerInstanceSubnet:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref ContainerInstanceSubnet
+
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: "Security Group for Revieee ALB"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref AcceptCidrIp
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref AcceptCidrIp
+  ContainerInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: "Security Group for Revieee Container Instance"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 32768
+          ToPort: 61000
+          SourceSecurityGroupId: !Ref AlbSecurityGroup
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+  EcsSpotFleetRequest:
+    Type: AWS::EC2::SpotFleet
+    Properties:
+      SpotFleetRequestConfigData:
+        IamFleetRole: !GetAtt FleetIAMRole.Arn
+        SpotPrice: !Ref SpotPrice
+        TargetCapacity: !Ref TargetCapacity
+        LaunchSpecifications:
+          - InstanceType: !Ref ContainerInstanceType
+            ImageId: !Ref ContainerInstanceImageId
+            IamInstanceProfile:
+              Arn: !GetAtt EcsClusterInstanceIAMInstanceProfile.Arn
+            SubnetId: !Ref ContainerInstanceSubnet
+            SecurityGroups:
+              - GroupId: !Ref ContainerInstanceSecurityGroup
+            UserData:
+              Fn::Base64: !Sub |
+                #!/bin/bash
+                echo ECS_CLUSTER=${EcsCluster} >> /etc/ecs/ecs.config
+  FleetIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - spotfleet.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetRole"
+  EcsClusterInstanceIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+  EcsClusterInstanceIAMInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EcsClusterInstanceIAMRole
+
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      SecurityGroups:
+        - !Ref AlbSecurityGroup
+      Subnets:
+        - !Ref AlbSubnet1
+        - !Ref AlbSubnet2
+
+  TemplateBucket:
+    Type: AWS::S3::Bucket
+
+Parameters:
+  AcceptCidrIp:
+    Type: String
+    AllowedPattern: "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\/\\d{1,2}$"
+    Description: "The cidr block allow access to Revieee"
+  SpotPrice:
+    Default: 0.124
+    Type: Number
+  TargetCapacity:
+    Default: 2
+    Type: Number
+  ContainerInstanceType:
+    Default: m5.large
+    Type: String
+  ContainerInstanceImageId:
+    Default: ami-f3f8098c
+    Type: AWS::EC2::Image::Id
+
+Outputs:
+  EcsClusterName:
+    Value: !Ref EcsCluster
+  AlbDNSName:
+    Value: !GetAtt ALB.DNSName
+  TemplateBucketName:
+    Value: !Ref TemplateBucket
