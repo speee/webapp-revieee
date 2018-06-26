@@ -12,6 +12,8 @@ Resources:
     Properties:
       Policies:
         - "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RepositoryTable
       CodeUri: build/
       Handler: main
       Events:
@@ -20,6 +22,16 @@ Resources:
           Properties:
             Path: /hooks/github
             Method: POST
+
+  RepositoryTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: repository
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 10
+        WriteCapacityUnits: 1
 
 Outputs:
   HelloWorldAPI:
