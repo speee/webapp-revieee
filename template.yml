@@ -10,6 +10,8 @@ Resources:
   MainFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Policies:
+        - "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
       CodeUri: build/
       Handler: main
       Events:
