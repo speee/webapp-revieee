@@ -9,6 +9,8 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/speee/webapp-revieee/src/alb"
+	"github.com/speee/webapp-revieee/src/ecs"
 )
 
 var (
@@ -26,6 +28,13 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	log.Print("-----")
 	log.Printf("%+#v\n", request.Body)
 	log.Print("-----")
+	taskArn := ecs.RunTask("test:1")
+	instanceId := ecs.DescribeTaskInstanceId(taskArn)
+	port := ecs.DescribeTaskPort(taskArn)
+	fmt.Println(taskArn)
+	fmt.Println(instanceId)
+	fmt.Println(port)
+	alb.Register(100, instanceId, port)
 	resp, err := http.Get(DefaultHTTPGetAddress)
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err

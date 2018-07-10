@@ -1,5 +1,6 @@
 .envrc
 build
+src/vendor
 
 ### https://raw.github.com/github/gitignore/9f6724149b9a0a861b402683f6c50c5f085d130b/Global/OSX.gitignore
 

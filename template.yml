@@ -5,6 +5,7 @@ Description: Build functions of Revieee
 Globals:
   Function:
     Runtime: go1.x
+    Timeout: 30
 
 Resources:
   MainFunction:
@@ -22,6 +23,11 @@ Resources:
           Properties:
             Path: /hooks/github
             Method: POST
+        HogeGithub:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
 
   RepositoryTable:
     Type: AWS::Serverless::SimpleTable
