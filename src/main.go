@@ -3,58 +3,41 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/google/go-github/github"
 	"github.com/speee/webapp-revieee/src/alb"
 	"github.com/speee/webapp-revieee/src/ecs"
-)
-
-var (
-	// DefaultHTTPGetAddress Default Address
-	DefaultHTTPGetAddress = "https://checkip.amazonaws.com"
-
-	// ErrNoIP No IP found in response
-	ErrNoIP = errors.New("No IP in HTTP response")
-
-	// ErrNon200Response non 200 status code in response
-	ErrNon200Response = errors.New("Non 200 Response found")
+	"github.com/speee/webapp-revieee/src/util"
+	"log"
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Print("-----")
-	log.Printf("%+#v\n", request.Body)
-	log.Print("-----")
-	taskArn := ecs.RunTask("test:1")
-	instanceId := ecs.DescribeTaskInstanceId(taskArn)
-	port := ecs.DescribeTaskPort(taskArn)
-	fmt.Println(taskArn)
-	fmt.Println(instanceId)
-	fmt.Println(port)
-	alb.Register(100, instanceId, port)
-	resp, err := http.Get(DefaultHTTPGetAddress)
+	event, err := github.ParseWebHook(request.Headers["X-Github-Event"], []byte(request.Body))
 	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
+		log.Printf("could not parse webhook: err=%s\n", err)
 	}
 
-	if resp.StatusCode != 200 {
-		return events.APIGatewayProxyResponse{}, ErrNon200Response
+	e, ok := event.(*github.PullRequestEvent)
+	if !ok {
+		log.Printf("unknown event type %s\n", request.Headers["X-Github-Event"])
+		return events.APIGatewayProxyResponse{}, errors.New("Invalid event")
 	}
+	log.Printf("Action: %+#v\n", *e.Action)
+	log.Printf("Number: %+#v\n", *e.Number)
+	log.Printf("Head: %+#v\n", *e.PullRequest.Head.Ref)
+	log.Printf("Base: %+#v\n", *e.PullRequest.Base.Ref)
+	log.Printf("RepoName: %+#v\n", *e.Repo.FullName)
 
-	ip, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
-	}
-
-	if len(ip) == 0 {
-		return events.APIGatewayProxyResponse{}, ErrNoIP
-	}
+	repoName := *e.Repo.FullName
+	prNumber := *e.Number
+	taskDefinition := "test:1"
+	uniqueName := util.Md5FromString(fmt.Sprintf("%s%i", repoName, prNumber))
+	targetGroupArn := alb.CreateAssociatedTargetGroup(uniqueName)
+	ecs.CreateService(uniqueName, taskDefinition, targetGroupArn)
 
 	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprintf("Hello, %v", string(ip)),
+		Body:       fmt.Sprintf("Access, %v", uniqueName),
 		StatusCode: 200,
 	}, nil
 }
