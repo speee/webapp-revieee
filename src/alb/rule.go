@@ -1,18 +1,21 @@
 package alb
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/elbv2"
+	"github.com/speee/webapp-revieee/src/revieee"
 )
 
-func createRule(targetGroupArn string, hostname string, priority int64) {
-	result, err := svc.CreateRule(&elbv2.CreateRuleInput{
+func createRule(target *revieee.Target, targetGroupArn *string) error {
+	endpoint := revieee.GetEndpoint(target)
+	priority := getCurrentMaxPriority() + 1
+
+	_, err := svc.CreateRule(&elbv2.CreateRuleInput{
 		Actions: []*elbv2.Action{
 			{
-				TargetGroupArn: aws.String(targetGroupArn),
+				TargetGroupArn: aws.String(*targetGroupArn),
 				Type:           aws.String("forward"),
 			},
 		},
@@ -20,7 +23,7 @@ func createRule(targetGroupArn string, hostname string, priority int64) {
 			{
 				Field: aws.String("host-header"),
 				Values: []*string{
-					aws.String(hostname),
+					aws.String(endpoint.Url),
 				},
 			},
 		},
@@ -28,11 +31,10 @@ func createRule(targetGroupArn string, hostname string, priority int64) {
 		Priority:    aws.Int64(priority),
 	})
 	if err != nil {
-		handleError(err)
-		return
+		return err
 	}
 
-	fmt.Println(result)
+	return nil
 }
 
 func getAllRules() []*elbv2.Rule {
