@@ -17,7 +17,7 @@ export function handler(event: any, context: Context, callback: Callback) {
   };
   const params: AWS.ECS.RunTaskRequest = {
     cluster: "revieee",
-    taskDefinition: "arn:aws:ecs:ap-northeast-1:951787653356:task-definition/im-ieul-core:3",
+    taskDefinition: "REPLACE_ME_ARN_OF_TASK_DEFINITION",
     overrides: taskOverride,
   };
 
